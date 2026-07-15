@@ -27,9 +27,7 @@ skin-selector-gui:
   status:
     equipped:
       lore:
-        - "&8&m---------------------------------"
-        - " &a¡ᴇQᴜɪᴘᴀᴅᴏ ᴀᴄᴛᴜᴀʟᴍᴇɴᴛᴇ!"
-        - "&8&m---------------------------------"
+        - " &a(ᴇQᴜɪᴘᴀᴅᴏ)"
     unlocked:
       lore:
         - "&8&m---------------------------------"
@@ -110,7 +108,7 @@ messages:
   admin-get-success: "&aᴇʟ ᴊᴜɢᴀᴅᴏʀ &e%player% &aᴛɪᴇɴᴇ &b%slots% &aʀᴀɴᴜʀᴀs ᴅᴇsʙʟᴏQᴜᴇᴀᴅas."
   item-given: "&a¡sᴇ ʜᴀ ᴇɴᴛʀᴇɢᴀᴅᴏ ʟᴀ ᴍᴏᴄʜɪʟᴀ ᴀ &e%player%&a!"
   skin-found: "&a¡ғᴇʟɪᴄɪᴅᴀᴅᴇs! ʜᴀs ᴇɴᴄᴏɴᴛʀᴀᴅᴏ ʟᴀ %skin_name%&a. ¡ᴀʜᴏʀᴀ ʟᴀ ᴛɪᴇɴᴇs ᴅᴇsʙʟᴏQᴜᴇᴀᴅᴀ!"
-  skin-already-found: "&cʏᴀ ʜᴀʙɪᴀs ᴅᴇsʙʟᴏQᴜᴇᴀᴅᴏ ᴇsᴛᴇ ᴀsᴘᴇᴄᴛᴏ ᴀɴᴛᴇʀɪᴏʀᴍᴇɴᴛ𝒆."
+  skin-already-found: "&cʏᴀ ʜᴀʙɪᴀs ᴅᴇsʙʟᴏQᴜᴇᴀᴅᴏ ᴇsᴛᴇ ᴀsᴘᴇᴄᴛᴏ ᴀɴᴛᴇʀɪᴏʀᴍᴇɴᴛe."
   skin-locked-find: "&cᴅᴇʙᴇs ᴇɴᴄᴏɴᴛʀᴀʀ ᴇsᴛᴇ ᴀsᴘᴇᴄᴛᴏ ᴇsᴄᴏɴᴅɪᴅᴏ ᴇɴ ᴇʟ ᴍᴀᴘᴀ ᴘᴀʀᴀ ᴅᴇsʙʟᴏQᴜᴇᴀʀʟᴏ."
   skin-equipped: "&a¡ʜᴀs ᴇϙᴜɪᴘᴀᴅᴏ ᴇʟ ᴀsᴘᴇᴄᴛᴏ %skin_name%&a!"
   loc-added: "&aᴜʙɪᴄᴀᴄɪᴏɴ ʀᴇɢɪsᴛʀᴀᴅᴀ ᴄᴏᴍᴏ ᴘᴜɴᴛᴏ ᴅᴇ ᴅᴇsʙʟᴏQᴜᴇᴀʀ ᴘᴀʀᴀ %skin_name%&a."
