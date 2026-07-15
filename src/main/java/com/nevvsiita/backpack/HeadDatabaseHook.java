@@ -93,28 +93,16 @@ public class HeadDatabaseHook implements Listener {
             try {
                 String textureUrl = getTextureUrlFromBase64(base64);
                 if (textureUrl != null) {
-                    java.lang.reflect.Method createProfileMethod = Bukkit.class.getMethod("createPlayerProfile", java.util.UUID.class, String.class);
-                    Object playerProfile = createProfileMethod.invoke(null, profileUuid, "CustomHead");
-
-                    java.lang.reflect.Method getTexturesMethod = playerProfile.getClass().getMethod("getTextures");
-                    Object playerTextures = getTexturesMethod.invoke(playerProfile);
-
-                    java.lang.reflect.Method setSkinMethod = playerTextures.getClass().getMethod("setSkin", java.net.URL.class);
-                    setSkinMethod.invoke(playerTextures, new java.net.URL(textureUrl));
-
-                    java.lang.reflect.Method setProfileMethod = null;
-                    for (java.lang.reflect.Method m : skullMeta.getClass().getMethods()) {
-                        if ((m.getName().equals("setOwnerProfile") || m.getName().equals("setPlayerProfile")) && m.getParameterCount() == 1) {
-                            setProfileMethod = m;
-                            break;
-                        }
-                    }
-                    if (setProfileMethod != null) {
-                        setProfileMethod.invoke(skullMeta, playerProfile);
-                        applied = true;
-                    }
+                    org.bukkit.profile.PlayerProfile playerProfile = Bukkit.createPlayerProfile(profileUuid, "CustomHead");
+                    org.bukkit.profile.PlayerTextures playerTextures = playerProfile.getTextures();
+                    playerTextures.setSkin(new java.net.URL(textureUrl));
+                    playerProfile.setTextures(playerTextures);
+                    skullMeta.setOwnerProfile(playerProfile);
+                    applied = true;
                 }
-            } catch (Exception ignored) {}
+            } catch (Throwable t) {
+                // Fallback silencioso al método clásico si no está soportado (versiones < 1.18)
+            }
 
             // 2. Fallback a la reflexión tradicional de GameProfile (Spigot 1.8 - 1.20.4)
             if (!applied) {
@@ -169,6 +157,8 @@ public class HeadDatabaseHook implements Listener {
     }
 
     private String getTextureUrlFromBase64(String base64) {
+        if (base64 == null) return null;
+        base64 = base64.trim().replace("\n", "").replace("\r", "").replace(" ", "");
         try {
             String decoded = new String(java.util.Base64.getDecoder().decode(base64));
             int index = decoded.indexOf("\"url\":\"");
@@ -180,7 +170,11 @@ public class HeadDatabaseHook implements Listener {
                 if (start != -1) {
                     int end = decoded.indexOf("\"", start);
                     if (end != -1) {
-                        return decoded.substring(start, end);
+                        String url = decoded.substring(start, end);
+                        if (url.startsWith("http://")) {
+                            url = "https://" + url.substring(7);
+                        }
+                        return url;
                     }
                 }
             }

@@ -76,7 +76,7 @@ public class BackPackPlugin extends JavaPlugin {
 
                 org.bukkit.Particle.DustOptions dust = new org.bukkit.Particle.DustOptions(color, 1.3f);
                 bukkitLoc.getWorld().spawnParticle(
-                        org.bukkit.Particle.REDSTONE,
+                        org.bukkit.Particle.DUST,
                         bukkitLoc.clone().add(0.5, 1.1, 0.5),
                         2,
                         0.05, 0.05, 0.05,

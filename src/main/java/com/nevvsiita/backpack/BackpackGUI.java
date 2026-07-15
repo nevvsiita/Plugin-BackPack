@@ -5,6 +5,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.Registry;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -157,7 +159,10 @@ public class BackpackGUI {
                                 lore.add(translateColors(line));
                             }
                         }
-                        meta.addEnchant(Enchantment.DURABILITY, 1, true);
+                        Enchantment unbreaking = Registry.ENCHANTMENT.get(NamespacedKey.minecraft("unbreaking"));
+                        if (unbreaking != null) {
+                            meta.addEnchant(unbreaking, 1, true);
+                        }
                         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                     } else if (data.hasSkinUnlocked(key)) {
                         // Skin desbloqueada pero no equipada

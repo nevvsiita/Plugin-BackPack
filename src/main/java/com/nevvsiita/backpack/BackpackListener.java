@@ -429,7 +429,7 @@ public class BackpackListener implements Listener {
             double offsetY = (Math.random() - 0.5) * 1.5;
             double offsetZ = (Math.random() - 0.5) * 1.5;
             loc.getWorld().spawnParticle(
-                    org.bukkit.Particle.REDSTONE,
+                    org.bukkit.Particle.DUST,
                     loc.clone().add(offsetX, offsetY, offsetZ),
                     1,
                     dust
