@@ -1,0 +1,237 @@
+# =========================================================================
+# CONFIGURACIÓN GENERAL DEL PLUGIN DE MOCHILA (BACKPACK)
+# =========================================================================
+
+# Ajustes de la interfaz de la mochila
+gui:
+  # Título del inventario (Mochila con degradado gris en negrita)
+  title: "<gradient:#95a5a6:#7f8c8d>&lᴍᴏᴄʜɪʟᴀ</gradient>"
+  # Tamaño del inventario. FIJADO EN 36 para diseño de 4 filas.
+  # (25 ranuras de almacenamiento en diseño centrado, botones de control simétricos)
+  size: 36
+
+# Ajustes de la interfaz del selector de aspectos (skins)
+skin-selector-gui:
+  # Título del inventario del selector (Gris oscuro y en tipografía Small Caps)
+  title: "&8&lsᴇʟᴇᴄᴛᴏʀ ᴅᴇ ᴀsᴘᴇᴄᴛᴏ"
+  # Botón de retroceso "Volver" (slot 17)
+  back-button:
+    material: "BARRIER"
+    name: "&c&lᴠᴏʟᴠᴇʀ"
+    lore:
+      - "&8&m---------------------------------"
+      - " &7ʜᴀᴢ ᴄʟɪᴄ ᴘᴀʀᴀ ʀᴇɢʀᴇsᴀʀ ᴀ ʟᴀ"
+      - " &7ᴍᴏᴄʜɪʟᴀ ᴘʀɪɴᴄɪᴘᴀʟ."
+      - "&8&m---------------------------------"
+  # Estados del aspecto según el progreso del jugador
+  status:
+    equipped:
+      lore:
+        - "&8&m---------------------------------"
+        - " &a¡ᴇQᴜɪᴘᴀᴅᴏ ᴀᴄᴛᴜᴀʟᴍᴇɴᴛᴇ!"
+        - "&8&m---------------------------------"
+    unlocked:
+      lore:
+        - "&8&m---------------------------------"
+        - " &eᴅᴇsʙʟᴏQᴜᴇᴀᴅᴏ"
+        - ""
+        - " &a&l→ ᴄʟɪᴄᴋ ᴘᴀʀᴀ ᴇQᴜɪᴘᴀʀ"
+        - "&8&m---------------------------------"
+    locked:
+      lore:
+        - "&8&m---------------------------------"
+        - " &cʙʟᴏQᴜᴇᴀᴅᴏ"
+        - ""
+        - " &7ᴅᴇʙᴇs ᴇɴᴄᴏɴᴛʀᴀʀ ᴇsᴛᴇ"
+        - " &7ᴀsᴘᴇᴄᴛᴏ ᴇsᴄᴏɴᴅɪᴅᴏ ᴇɴ"
+        - " &7ᴇʟ ᴍᴀᴘᴀ ᴘᴀʀᴀ ᴅᴇsʙʟᴏQᴜᴇᴀʀʟᴏ."
+        - "&8&m---------------------------------"
+
+# Ajustes del ítem físico de la mochila
+backpack-item:
+  # Nombre del ítem (Nombre de la Skin + (ᴄʟɪᴄᴋ ᴅᴇʀᴇᴄʜᴏ ᴘᴀʀᴀ ᴀʙʀɪʀ) en gris y Small Caps)
+  name: "%skin_name% &7(ᴄʟɪᴄᴋ ᴅᴇʀᴇᴄʜᴏ ᴘᴀʀᴀ ᴀʙʀɪʀ)"
+  # Lore del ítem
+  lore:
+    - "&8&m---------------------------------"
+    - " &7¡ᴜɴᴀ ᴍᴏᴄʜɪʟᴀ ᴘᴏʀᴛᴀᴛɪʟ ᴘᴀʀᴀ ᴛᴜs ᴠɪᴀᴊᴇs!"
+    - ""
+    - " &e&l→ ʜᴀᴢ ᴄʟɪᴄ ᴘᴀʀᴀ ʜᴀᴄᴇʀ ᴄʟɪᴄ ᴅᴇʀᴇᴄʜᴏ ʏ ᴀʙʀɪʀʟᴀ"
+    - "&8&m---------------------------------"
+
+# Ítem del botón para abrir el selector de colores (slot 31 - centro de la fila 4)
+# Con degradado gris en Small Caps y sin descripción (lore vacío)
+color-button:
+  material: "PLAYER_HEAD"
+  hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWU2NjM2OTI4NWU5OWNmMzdjNDQyM2Y3YWY2ODEyZGRlYjc5MGI5NzQ3NWFhZmJkNTY1MGJlZTQ0N2EyZGE0NyJ9fX0="
+  name: "<gradient:#95a5a6:#7f8c8d>&lᴄᴀᴍʙɪᴀʀ ᴄᴏʟᴏʀ / ᴀsᴘᴇᴄᴛᴏ</gradient>"
+  lore: []
+
+# Ajustes de los botones de navegación de páginas (slots 28 y 34)
+page-buttons:
+  next-locked:
+    material: "GRAY_STAINED_GLASS_PANE"
+    name: "&c&lᴘᴀɢɪɴᴀ sɪɢᴜɪᴇɴᴛᴇ &7(ʙʟᴏQᴜᴇᴀᴅᴀ)"
+    lore:
+      - "&8&m---------------------------------"
+      - " &7ᴅᴇʙᴇs ᴅᴇsʙʟᴏQᴜᴇᴀʀ ʟᴀs 25 ʀᴀɴᴜʀᴀs"
+      - " &7ᴅᴇ ᴇsᴛᴀ ᴘᴀɢɪɴᴀ ᴘᴀʀᴀ ᴘᴏᴅᴇʀ"
+      - " &7ᴀᴄᴄᴇᴅᴇʀ ᴀ ʟᴀ sɪɢᴜɪᴇɴᴛᴇ ᴘᴀɢɪɴᴀ."
+      - "&8&m---------------------------------"
+  next-unlocked:
+    material: "ARROW"
+    name: "&a&lᴘᴀɢɪɴᴀ sɪɢᴜɪᴇɴᴛᴇ &7(ᴘᴀɢɪɴᴀ %next_page%)"
+    lore:
+      - "&8&m---------------------------------"
+      - " &7¡ʜᴀs ᴄᴏᴍᴘʟᴇᴛᴀᴅᴏ ʟᴀ ᴘᴀɢɪɴᴀ ᴀɴᴛᴇʀɪᴏʀ!"
+      - " &7ʜᴀᴢ ᴄʟɪᴄ ᴘᴀʀᴀ ɪʀ ᴀ ʟᴀ sɪɢᴜɪᴇɴᴛᴇ."
+      - ""
+      - " &a&l→ ᴄʟɪᴄᴋ ᴘᴀʀᴀ ᴀᴠᴀɴᴢᴀʀ"
+      - "&8&m---------------------------------"
+  previous:
+    material: "ARROW"
+    name: "&e&lᴘᴀɢɪɴᴀ ᴀɴᴛᴇʀɪᴏʀ &7(ᴘᴀɢɪɴᴀ %prev_page%)"
+    lore:
+      - "&8&m---------------------------------"
+      - " &7ʜᴀᴢ ᴄʟɪᴄ ᴘᴀʀᴀ ʀᴇɢʀᴇsᴀʀ ᴀ ʟᴀ"
+      - " &7ᴘᴀɢɪɴᴀ ᴀɴᴛᴇʀɪᴏʀ."
+      - ""
+      - " &e&l→ ᴄʟɪᴄᴋ ᴘᴀʀᴀ ʀᴇɢʀᴇsᴀʀ"
+      - "&8&m---------------------------------"
+
+# Mensajes del plugin (soporta códigos de color)
+messages:
+  prefix: "&7[&bᴍᴏᴄʜɪʟᴀ&7] &r"
+  no-permission: "&cɴᴏ ᴛɪᴇɴᴇs ᴘᴇʀᴍɪsᴏs ᴘᴀʀᴀ ᴜsᴀʀ ᴇsᴛᴇ ᴄᴏᴍᴀɴᴅᴏ."
+  only-players: "&cᴇsᴛᴇ ᴄᴏᴍᴀɴᴅᴏ sᴏʟᴏ ᴘᴜᴇᴅᴇ sᴇʀ ᴇᴊᴇᴄᴜᴛᴀᴅᴏ ᴘᴏʀ ᴊᴜɢᴀᴅᴏʀᴇs."
+  no-funds: "&cɴᴏ ᴛɪᴇɴᴇs sᴜғɪᴄɪᴇɴᴛᴇ ᴅɪɴᴇʀᴏ. ɴᴇᴄᴇsɪᴛᴀs &e$%cost%&c."
+  slot-unlocked: "&a¡ʜᴀs ᴅᴇsʙʟᴏQᴜᴇᴀᴅᴏ ᴜɴᴀ ɴᴜᴇᴠᴀ ʀᴀɴᴜʀᴀ ᴘᴏʀ &e$%cost%&a!"
+  slot-locked-previous: "&c¡ᴅᴇʙᴇs ᴅᴇsʙʟᴏQᴜᴇᴀʀ ʟᴀs ʀᴀɴᴜʀᴀs ᴀɴᴛᴇʀɪᴏʀᴇs ᴘʀɪᴍᴇʀᴏ!"
+  data-saved: "&aʟᴏs ᴅᴀᴛᴏs ᴅᴇ ᴛᴜ ᴍᴏᴄʜɪʟᴀ ʜᴀɴ sɪᴅᴏ ɢᴜᴀʀᴅᴀᴅᴏs."
+  admin-usage: "&eᴜsᴏ: &b/mochila admin [setslots/getslots/addloc/removeloc/reload] ... &oó &b/mochila give [jugador]"
+  player-not-found: "&cᴊᴜɢᴀᴅᴏʀ ɴᴏ ᴇɴᴄᴏɴᴛʀᴀᴅᴏ."
+  admin-set-success: "&aʜᴀs ᴇsᴛᴀʙʟᴇᴄɪᴅᴏ ʟᴀs ʀᴀɴᴜʀᴀs ᴅᴇ &e%player% &aᴀ &b%slots%&a."
+  admin-get-success: "&aᴇʟ ᴊᴜɢᴀᴅᴏʀ &e%player% &aᴛɪᴇɴᴇ &b%slots% &aʀᴀɴᴜʀᴀs ᴅᴇsʙʟᴏQᴜᴇᴀᴅas."
+  item-given: "&a¡sᴇ ʜᴀ ᴇɴᴛʀᴇɢᴀᴅᴏ ʟᴀ ᴍᴏᴄʜɪʟᴀ ᴀ &e%player%&a!"
+  skin-found: "&a¡ғᴇʟɪᴄɪᴅᴀᴅᴇs! ʜᴀs ᴇɴᴄᴏɴᴛʀᴀᴅᴏ ʟᴀ %skin_name%&a. ¡ᴀʜᴏʀᴀ ʟᴀ ᴛɪᴇɴᴇs ᴅᴇsʙʟᴏQᴜᴇᴀᴅᴀ!"
+  skin-already-found: "&cʏᴀ ʜᴀʙɪᴀs ᴅᴇsʙʟᴏQᴜᴇᴀᴅᴏ ᴇsᴛᴇ ᴀsᴘᴇᴄᴛᴏ ᴀɴᴛᴇʀɪᴏʀᴍᴇɴᴛᴇ."
+  skin-locked-find: "&cᴅᴇʙᴇs ᴇɴᴄᴏɴᴛʀᴀʀ ᴇsᴛᴇ ᴀsᴘᴇᴄᴛᴏ ᴇsᴄᴏɴᴅɪᴅᴏ ᴇɴ ᴇʟ ᴍᴀᴘᴀ ᴘᴀʀᴀ ᴅᴇsʙʟᴏQᴜᴇᴀʀʟᴏ."
+  skin-equipped: "&a¡ʜᴀs ᴇϙᴜɪᴘᴀᴅᴏ ᴇʟ ᴀsᴘᴇᴄᴛᴏ %skin_name%&a!"
+  loc-added: "&aᴜʙɪᴄᴀᴄɪᴏɴ ʀᴇɢɪsᴛʀᴀᴅᴀ ᴄᴏᴍᴏ ᴘᴜɴᴛᴏ ᴅᴇ ᴅᴇsʙʟᴏQᴜᴇᴀʀ ᴘᴀʀᴀ %skin_name%&a."
+  loc-removed: "&cᴜʙɪᴄᴀᴄɪᴏɴ ᴇʟɪᴍɪɴᴀᴅᴀ ᴄᴏᴍᴏ ᴘᴜɴᴛᴏ ᴅᴇ ᴅᴇsʙʟᴏQᴜᴇᴏ."
+  no-block-looking: "&cᴅᴇʙᴇs ᴇsᴛᴀʀ ᴍɪʀᴀɴᴅᴏ ᴜɴ ʙʟᴏϙᴜᴇ ᴘᴀʀᴀ ʜᴀᴄᴇʀ ᴇsᴛᴏ."
+  no-loc-here: "&cɴᴏ ʜᴀʏ ɴɪɴɢᴜɴᴀ ᴍᴏᴄʜɪʟᴀ ʀᴇɢɪsᴛʀᴀᴅᴀ ᴇɴ ᴇsᴛᴇ ʙʟᴏϙᴜᴇ."
+
+# Sonidades de la interfaz al comprar/interactuar
+sounds:
+  unlock-success: "ENTITY_PLAYER_LEVELUP"
+  unlock-fail: "ENTITY_VILLAGER_NO"
+  open-backpack: "BLOCK_SHULKER_BOX_OPEN"
+  close-backpack: "BLOCK_SHULKER_BOX_CLOSE"
+  equip-skin: "ITEM_ARMOR_EQUIP_LEATHER"
+  find-skin: "UI_TOAST_CHALLENGE_COMPLETE"
+
+# Items visuales para los slots bloqueados
+items:
+  locked-next:
+    material: "RED_STAINED_GLASS_PANE"
+    name: "<gradient:#ff4b2b:#ff416c>&lʀᴀɴᴜʀᴀ ʙʟᴏQᴜᴇᴀᴅᴀ</gradient>"
+    lore:
+      - "&8&m---------------------------------"
+      - " &7¡ᴇsᴛᴀ ʀᴀɴᴜʀᴀ ᴇsᴛᴀ ʙʟᴏQᴜᴇᴀᴅᴀ!"
+      - " &7ᴄᴏsᴛᴏ ᴘᴀʀᴀ ᴅᴇsʙʟᴏQᴜᴇᴀʀ: &a$%cost%"
+      - ""
+      - " &e&l→ ʜᴀᴢ ᴄʟɪᴄ ᴘᴀʀᴀ ᴅᴇsʙʟᴏQᴜᴇᴀʀ"
+      - "&8&m---------------------------------"
+  locked-future:
+    material: "GRAY_STAINED_GLASS_PANE"
+    name: "&8&lʀᴀɴᴜʀᴀ ʙʟᴏQᴜᴇᴀᴅᴀ"
+    lore:
+      - "&8&m---------------------------------"
+      - " &7¡ᴅᴇʙᴇs ᴅᴇsʙʟᴏQᴜᴇᴀʀ ʟᴀs ʀᴀɴᴜʀᴀs"
+      - " &7ᴀɴᴛᴇʀɪᴏʀᴇs ᴀɴᴛᴇs ᴅᴇ ᴄᴏᴍᴘʀᴀʀ ᴇsᴛᴀ!"
+      - "&8&m---------------------------------"
+
+# Costo para desbloquear cada slot.
+# El máximo de ranuras de almacenamiento por página es 25 (en diseño centrado).
+# Así que definimos la escala de costos del 2 al 25.
+unlock-costs:
+  2: 100
+  3: 200
+  4: 400
+  5: 800
+  6: 1500
+  7: 3000
+  8: 5000
+  9: 8000
+  10: 12000
+  11: 16000
+  12: 20000
+  13: 25000
+  14: 30000
+  15: 35000
+  16: 40000
+  17: 45000
+  18: 50000
+  19: 60000
+  20: 70000
+  21: 80000
+  22: 90000
+  23: 100000
+  24: 120000
+  25: 140000
+  # Costo por defecto para slots >= 26 si hubiese más
+  default-multiplier: 10000
+
+# Lista de aspectos/colores de mochila disponibles para desbloquear.
+# Las partículas de redstone emiten el color definido en RGB.
+# Las cabezas corresponden exactamente a la misma colección del plugin HeadDatabase.
+backpack-skins:
+  gray:
+    hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzNjMGJmYTg3NWFiOGI4M2Q4ZDk1MTk3NzRjNmM3YzQ1YWQ5YTg4NDNmNjhhNGE1YzAwMDM3NDMyNjBlMmVjNSJ9fX0="
+    name: "<gradient:#95a5a6:#7f8c8d>&lᴍᴏᴄʜɪʟᴀ</gradient>"
+    particle-color: "128,128,128"
+  brown:
+    hdb-id: "32286"
+    name: "<gradient:#e67e22:#d35400>&lᴍᴏᴄʜɪʟᴀ ᴍᴀʀʀᴏɴ</gradient>"
+    particle-color: "139,69,19"
+  darkgreen:
+    hdb-id: "32287"
+    name: "<gradient:#27ae60:#1e5f37>&lᴍᴏᴄʜɪʟᴀ ᴠᴇʀᴅᴇ ᴏsᴄᴜʀᴏ</gradient>"
+    particle-color: "34,139,34"
+  green:
+    hdb-id: "32280"
+    name: "<gradient:#2ecc71:#27ae60>&lᴍᴏᴄʜɪʟᴀ ᴠᴇʀᴅᴇ</gradient>"
+    particle-color: "50,205,50"
+  orange:
+    hdb-id: "32278"
+    name: "<gradient:#ff9f43:#ff6b6b>&lᴍᴏᴄʜɪʟᴀ ɴᴀʀᴀɴᴊᴀ</gradient>"
+    particle-color: "255,127,0"
+  purple:
+    hdb-id: "32283"
+    name: "<gradient:#9b59b6:#8e44ad>&lᴍᴏᴄʜɪʟᴀ ᴘᴜʀᴘᴜʀᴀ</gradient>"
+    particle-color: "186,85,211"
+  pink:
+    hdb-id: "32277"
+    name: "<gradient:#ff9ff3:#feca57>&lᴍᴏᴄʜɪʟᴀ ʀᴏsᴀ</gradient>"
+    particle-color: "255,105,180"
+  blue:
+    hdb-id: "32279"
+    name: "<gradient:#3498db:#2980b9>&lᴍᴏᴄʜɪʟᴀ ᴀᴢᴜʟ</gradient>"
+    particle-color: "0,191,255"
+  red:
+    hdb-id: "32285"
+    name: "<gradient:#e74c3c:#c0392b>&lᴍᴏᴄʜɪʟᴀ ʀᴏᴊᴀ</gradient>"
+    particle-color: "255,0,0"
+  white:
+    hdb-id: "32275"
+    name: "<gradient:#ffffff:#bdc3c7>&lᴍᴏᴄʜɪʟᴀ ʙʟᴀɴᴄᴀ</gradient>"
+    particle-color: "240,240,240"
+  yellow:
+    hdb-id: "32284"
+    name: "<gradient:#f1c40f:#f39c12>&lᴍᴏᴄʜɪʟᴀ ᴀᴍᴀʀɪʟʟᴀ</gradient>"
+    particle-color: "255,215,0"
+  darkblue:
+    hdb-id: "32288"
+    name: "<gradient:#2c3e50:#34495e>&lᴍᴏᴄʜɪʟᴀ ᴀᴢᴜʟ ᴏsᴄᴜʀᴏ</gradient>"
+    particle-color: "0,0,139"
