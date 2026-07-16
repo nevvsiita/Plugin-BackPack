@@ -142,6 +142,7 @@ messages:
   skin-equipped: "&a¡ʜᴀs ᴇϙᴜɪᴘᴀᴅᴏ ᴇʟ ᴀsᴘᴇᴄᴛᴏ %skin_name%&a!"
   loc-added: "&aᴜʙɪᴄᴀᴄɪᴏɴ ʀᴇɢɪsᴛʀᴀᴅᴀ ᴄᴏᴍᴏ ᴘᴜɴᴛᴏ ᴅᴇ ᴅᴇsʙbʟᴏQᴜᴇᴀʀ ᴘᴀʀᴀ %skin_name%&a."
   upgrade-success: "&a¡Enhorabuena! Has mejorado tu mochila a &e%rows% filas &apor &6$%cost%&a!"
+  no-economy: "&cEl sistema de economía (Vault) no está disponible en este momento."
   loc-removed: "&c... &c."
   no-block-looking: "&c... &c."
   no-loc-here: "&cɴᴏ ʜᴀʏ ɴɪɴɢᴜɴᴀ ᴍᴏᴄʜɪʟᴀ ʀᴇɢɪsᴛʀᴀᴅᴀ ᴇɴ ᴇsᴛᴇ ʙʟᴏϙᴜᴇ."

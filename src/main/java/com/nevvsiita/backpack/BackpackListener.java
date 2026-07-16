@@ -552,20 +552,25 @@ public class BackpackListener implements Listener {
             cost = config.getInt("upgrade-button.cost-row-5", 1600000);
         }
 
-        // Verificar dinero usando Vault
-        if (plugin.getVaultHook() != null && plugin.getVaultHook().hasEconomy()) {
-            double balance = plugin.getVaultHook().getBalance(player);
-            if (balance < cost) {
-                String noFundsMsg = config.getString("messages.no-funds", "&cNo tienes suficiente dinero. Necesitas &e$%cost%&c.")
-                        .replace("%cost%", String.valueOf(cost));
-                player.sendMessage(translateColors(config.getString("messages.prefix") + noFundsMsg));
-                playConfigSound(player, "sounds.unlock-fail", "ENTITY_VILLAGER_NO");
-                return;
-            }
-
-            // Descontar dinero
-            plugin.getVaultHook().withdraw(player, cost);
+        // Verificar dinero usando Vault de manera estricta
+        if (plugin.getVaultHook() == null || !plugin.getVaultHook().hasEconomy()) {
+            String noEconMsg = config.getString("messages.no-economy", "&cEl sistema de economía (Vault) no está disponible en este momento.");
+            player.sendMessage(translateColors(config.getString("messages.prefix") + noEconMsg));
+            playConfigSound(player, "sounds.unlock-fail", "ENTITY_VILLAGER_NO");
+            return;
         }
+
+        double balance = plugin.getVaultHook().getBalance(player);
+        if (balance < cost) {
+            String noFundsMsg = config.getString("messages.no-funds", "&cNo tienes suficiente dinero. Necesitas &e$%cost%&c.")
+                    .replace("%cost%", String.valueOf(cost));
+            player.sendMessage(translateColors(config.getString("messages.prefix") + noFundsMsg));
+            playConfigSound(player, "sounds.unlock-fail", "ENTITY_VILLAGER_NO");
+            return;
+        }
+
+        // Descontar dinero
+        plugin.getVaultHook().withdraw(player, cost);
 
         // Actualizar progreso de filas del jugador
         data.setUnlockedSlots(nextRows);
