@@ -107,19 +107,11 @@ public class BackpackGUI {
         BackpackHolder holder = new BackpackHolder(uuid, 1, backpackItem, slot);
         Inventory inventory = Bukkit.createInventory(holder, size, title);
 
-        // Cargar los items de la mochila desde el NBT del item físico
-        ItemMeta meta = backpackItem.getItemMeta();
-        if (meta != null) {
-            PersistentDataContainer pdc = meta.getPersistentDataContainer();
-            NamespacedKey contentsKey = new NamespacedKey(plugin, "backpack_contents");
-            if (pdc.has(contentsKey, PersistentDataType.STRING)) {
-                String base64 = pdc.get(contentsKey, PersistentDataType.STRING);
-                ItemStack[] items = itemStackArrayFromBase64(base64);
-                for (int i = 0; i < 27; i++) {
-                    if (i < items.length && items[i] != null) {
-                        inventory.setItem(i, items[i].clone());
-                    }
-                }
+        // Copiar los contenidos del ender chest del jugador a los primeros 27 slots (0-26)
+        ItemStack[] ecContents = player.getEnderChest().getContents();
+        for (int i = 0; i < 27; i++) {
+            if (i < ecContents.length && ecContents[i] != null) {
+                inventory.setItem(i, ecContents[i].clone());
             }
         }
 

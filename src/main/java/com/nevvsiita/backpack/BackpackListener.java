@@ -332,30 +332,13 @@ public class BackpackListener implements Listener {
         }
 
         Player player = (Player) event.getPlayer();
-        BackpackGUI.BackpackHolder holder = (BackpackGUI.BackpackHolder) inventory.getHolder();
-        ItemStack backpackItem = holder.getBackpackItem();
-
-        // 1. Guardar ítems de los slots 0-26 de la GUI
-        ItemStack[] contents = new ItemStack[27];
+        // Guardar ítems de los slots 0-26 en el Ender Chest del jugador
+        ItemStack[] enderChestContents = new ItemStack[27];
         for (int i = 0; i < 27; i++) {
             ItemStack item = inventory.getItem(i);
-            contents[i] = (item != null && item.getType() != org.bukkit.Material.AIR) ? item.clone() : null;
+            enderChestContents[i] = (item != null && item.getType() != org.bukkit.Material.AIR) ? item.clone() : null;
         }
-
-        // 2. Serializar y guardar en el NBT del item físico
-        try {
-            String base64 = BackpackGUI.itemStackArrayToBase64(contents);
-            ItemMeta meta = backpackItem.getItemMeta();
-            if (meta != null) {
-                PersistentDataContainer pdc = meta.getPersistentDataContainer();
-                NamespacedKey contentsKey = new NamespacedKey(plugin, "backpack_contents");
-                pdc.set(contentsKey, PersistentDataType.STRING, base64);
-                backpackItem.setItemMeta(meta);
-            }
-        } catch (Exception e) {
-            player.sendMessage(translateColors("&c¡Error fatal guardando los contenidos de la mochila!"));
-            plugin.getLogger().severe("No se pudo guardar la mochila: " + e.getMessage());
-        }
+        player.getEnderChest().setContents(enderChestContents);
 
         // Sonido de cierre
         String soundName = plugin.getConfig().getString("sounds.close-backpack", "BLOCK_CHEST_CLOSE");
