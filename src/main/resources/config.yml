@@ -44,6 +44,10 @@ backpack-display:
     x: 0.65
     y: 0.65
     z: 0.65
+  # Ajuste del tag de nombre sustituto
+  nametag:
+    # Altura del tag sobre la cabeza del jugador (en bloques)
+    y-offset: 0.25
 
 # Ajustes de la interfaz del selector de aspectos (skins)
 skin-selector-gui:
