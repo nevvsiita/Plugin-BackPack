@@ -66,6 +66,8 @@ upgrade-button:
   cost-row-5: 1600000
   lore:
     - "&8&m---------------------------------"
+    - " &7¡Mejora la capacidad de tu mochila!"
+    - ""
     - " &fCapacidad actual: &e%current_rows% Fila(s) (%current_slots% slots)"
     - " &fSiguiente nivel: &a%next_rows% Fila(s) (%next_slots% slots)"
     - " &fCosto de mejora: &6$%cost%"
