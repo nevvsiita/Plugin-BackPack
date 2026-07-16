@@ -5,7 +5,7 @@
 # Ajustes de la interfaz de la mochila
 gui:
   # Título del inventario (Mochila con degradado gris en negrita)
-  title: "<gradient:#95a5a6:#7f8c8d>&lᴍᴏᴄʜɪʟᴀ</gradient>"
+  title: "<gradient:#95a5a6:#7f8c8d>&lᴍᴏᴄʜɪʟᴀ ᴅᴇ</gradient> &7%player%"
   # Tamaño del inventario. FIJADO EN 36 para diseño de 4 filas.
   # (25 ranuras de almacenamiento en diseño centrado, botones de control simétricos)
   size: 36

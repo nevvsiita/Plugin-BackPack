@@ -101,7 +101,8 @@ public class BackpackGUI {
         FileConfiguration config = plugin.getConfig();
         int size = 36; // Forzar tamaño de 4 filas
 
-        String title = config.getString("gui.title", "<gradient:#a18cd1:#fa97c4>&lᴍᴏᴄʜɪʟᴀ</gradient>");
+        String title = config.getString("gui.title", "<gradient:#a18cd1:#fa97c4>&lᴍᴏᴄʜɪʟᴀ</gradient> %player%");
+        title = title.replace("%player%", player.getName());
         title = translateColors(title);
 
         BackpackHolder holder = new BackpackHolder(uuid, 1, backpackItem, slot);
