@@ -35,23 +35,9 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         String prefix = getMsg("messages.prefix");
 
-        // Si no hay argumentos, abre la mochila en la mano del remitente
+        // Si no hay argumentos, enviar un mensaje indicando que está desactivado y se debe usar el ítem físico
         if (args.length == 0) {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage(prefix + getMsg("messages.only-players"));
-                return true;
-            }
-            Player player = (Player) sender;
-            if (!player.hasPermission("backpack.use")) {
-                player.sendMessage(prefix + getMsg("messages.no-permission"));
-                return true;
-            }
-            ItemStack held = player.getInventory().getItemInMainHand();
-            if (held != null && held.getType() != Material.AIR && isBackpackItem(held)) {
-                plugin.getBackpackGUI().openGUI(player, held, player.getInventory().getHeldItemSlot());
-            } else {
-                player.sendMessage(prefix + BackpackGUI.translateColors("&cDebes tener una mochila en tu mano principal para abrirla."));
-            }
+            sender.sendMessage(prefix + BackpackGUI.translateColors("&cEl comando para abrir la mochila está desactivado. Haz clic derecho con el ítem físico de la mochila para abrirla."));
             return true;
         }
 
