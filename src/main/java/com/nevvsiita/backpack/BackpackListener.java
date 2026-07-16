@@ -299,7 +299,6 @@ public class BackpackListener implements Listener {
                                     plugin.getConfig().getString("messages.skin-equipped").replace("%skin_name%", displayName)));
                             
                             plugin.getBackpackGUI().openSkinSelector(player, backpackItem, sh.getSlot());
-                            plugin.getBackpackDisplayManager().updateDisplay(player);
                         } else {
                             playConfigSound(player, "sounds.unlock-fail", "ENTITY_VILLAGER_NO");
                             player.sendMessage(translateColors(plugin.getConfig().getString("messages.prefix") + 
@@ -423,7 +422,6 @@ public class BackpackListener implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        plugin.getBackpackDisplayManager().removeDisplay(event.getPlayer());
         plugin.getBackpackManager().unloadBackpack(event.getPlayer().getUniqueId());
     }
 
