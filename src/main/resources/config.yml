@@ -10,6 +10,11 @@ gui:
   # (25 ranuras de almacenamiento en diseño centrado, botones de control simétricos)
   size: 36
 
+# Ajustes de cooldowns del plugin (en segundos)
+cooldowns:
+  # Tiempo de espera para cambiar de color/aspecto de mochila
+  change-skin: 10
+
 # Ajustes de la interfaz del selector de aspectos (skins)
 skin-selector-gui:
   # Título del inventario del selector (Gris oscuro y en tipografía Small Caps)
@@ -144,6 +149,7 @@ messages:
   no-block-looking: "&cDebes estar mirando un bloque para registrar la ubicación."
   no-loc-here: "&cNo hay ninguna mochila registrada en este bloque."
   loc-removed: "&cUbicación de desbloqueo eliminada para %skin_name%."
+  cooldown-skin: "&cDebes esperar %time% segundos antes de volver a cambiar tu aspecto."
 
 # Sonidades de la interfaz al comprar/interactuar
 sounds:

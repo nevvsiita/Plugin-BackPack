@@ -28,6 +28,7 @@ public class BackpackListener implements Listener {
 
     private final BackPackPlugin plugin;
     private final NamespacedKey backpackKey;
+    private final java.util.Map<UUID, Long> skinChangeCooldowns = new java.util.HashMap<>();
 
     public BackpackListener(BackPackPlugin plugin) {
         this.plugin = plugin;
@@ -222,6 +223,18 @@ public class BackpackListener implements Listener {
                         }
 
                         if (data.hasSkinUnlocked(skinKey)) {
+                            // Verificar cooldown para cambiar de skin
+                            long now = System.currentTimeMillis();
+                            if (skinChangeCooldowns.containsKey(uuid) && skinChangeCooldowns.get(uuid) > now) {
+                                long remainingMs = skinChangeCooldowns.get(uuid) - now;
+                                double remainingSecs = Math.ceil(remainingMs / 1000.0);
+                                String cooldownMsg = plugin.getConfig().getString("messages.cooldown-skin", "&cDebes esperar %time% segundos antes de volver a cambiar tu aspecto.")
+                                        .replace("%time%", String.valueOf((int) remainingSecs));
+                                player.sendMessage(translateColors(plugin.getConfig().getString("messages.prefix") + cooldownMsg));
+                                playConfigSound(player, "sounds.unlock-fail", "ENTITY_VILLAGER_NO");
+                                return;
+                            }
+
                             // Cambiar textura de la cabeza y el nombre del item físico
                             String displayName = skinsSection.getString(skinKey + ".name", skinKey);
                             String hdbId = skinsSection.getString(skinKey + ".hdb-id");
@@ -250,6 +263,12 @@ public class BackpackListener implements Listener {
                                 NamespacedKey skinKeyTag = new NamespacedKey(plugin, "backpack_skin");
                                 itemMeta.getPersistentDataContainer().set(skinKeyTag, PersistentDataType.STRING, skinKey);
                                 backpackItem.setItemMeta(itemMeta);
+                            }
+
+                            // Establecer cooldown
+                            int cooldownSecs = plugin.getConfig().getInt("cooldowns.change-skin", 10);
+                            if (cooldownSecs > 0) {
+                                skinChangeCooldowns.put(uuid, now + (cooldownSecs * 1000L));
                             }
 
                             playConfigSound(player, "sounds.equip-skin", "ITEM_ARMOR_EQUIP_LEATHER");
