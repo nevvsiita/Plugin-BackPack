@@ -58,7 +58,7 @@ backpack-item:
 # Botón de mejoras de espacio (slot 33 - fila 4)
 upgrade-button:
   material: "PLAYER_HEAD"
-  hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2RkM2NlMTM3YTc4NTcxZThlYzY1NWJhN2ZkMDc1ZjQ5ZjRiZDI5YWY1NWY2ZDNlY2FhYWY0MWJhNzE5ZCJ9fX0="
+  hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTM3ZGNmYjY2YTYxYzUyOWYyYTEyOGFlZWY5M2MyNWY5ZDBiMDQzOWI1OWZiMTk5ZDJiMDRhY2ZlMGI4NWFhYyJ9fX0="
   name: "<#FFE0AF>&lᴍᴇᴊᴏʀᴀʀ ᴄᴀᴘᴀᴄɪᴅᴀᴅ</gradient>"
   cost-row-2: 400000
   cost-row-3: 800000
