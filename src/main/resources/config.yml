@@ -5,7 +5,7 @@
 # Ajustes de la interfaz de la mochila
 gui:
   # Título del inventario (Mochila con degradado gris en negrita)
-  title: "<gradient:#95a5a6:#7f8c8d>&lᴍᴏᴄʜɪʟᴀ ᴅᴇ</gradient> &7%player%"
+  title: "&8&lʙᴀᴄᴋᴘᴀᴄᴋ &r&7%player%"
   # Tamaño del inventario. FIJADO EN 36 para diseño de 4 filas.
   # (25 ranuras de almacenamiento en diseño centrado, botones de control simétricos)
   size: 36
@@ -27,30 +27,32 @@ skin-selector-gui:
   status:
     equipped:
       lore:
-        - " &a(ᴇQᴜɪᴘᴀᴅᴏ)"
+        - "&8&m---------------------------------"
+        - " <#B8FFBA>&l(&lᴇ&lǫ&lᴜ&lɪ&lᴘ&lᴀ&lᴅ&lᴏ&l)"
+        - "&8&m---------------------------------"
     unlocked:
       lore:
         - "&8&m---------------------------------"
-        - " &eᴅᴇsʙʟᴏQᴜᴇᴀᴅᴏ"
+        - " &eᴅᴇѕʙʟᴏǫᴜᴇᴀᴅᴏ"
         - ""
-        - " &a&l→ ᴄʟɪᴄᴋ ᴘᴀʀᴀ ᴇQᴜɪᴘᴀʀ"
+        - " <#B8FFBA>&l→ &lᴄ&lʟ&lɪ&lᴄ&lᴋ &lᴘ&lᴀ&lʀ&lᴀ &lᴇ&lǫ&lᴜ&lɪ&lᴘ&lᴀ&lʀ"
         - "&8&m---------------------------------"
     locked:
       lore:
         - "&8&m---------------------------------"
-        - " &cʙʟᴏQᴜᴇᴀᴅᴏ"
+        - " &cʙʟᴏǫᴜᴇᴀᴅᴏ"
         - "&8&m---------------------------------"
 
 # Ajustes del ítem físico de la mochila
 backpack-item:
   # Nombre del ítem (Nombre de la Skin + (ᴄʟɪᴄᴋ ᴅᴇʀᴇᴄʜᴏ ᴘᴀʀᴀ ᴀʙʀɪʀ) en gris y Small Caps)
-  name: "%skin_name% &7(ᴄʟɪᴄᴋ ᴅᴇʀᴇᴄʜᴏ ᴘᴀʀᴀ ᴀʙʀɪʀ)"
+  name: "%skin_name%"
   # Lore del ítem
   lore:
     - "&8&m---------------------------------"
-    - " &7¡ᴜɴᴀ ᴍᴏᴄʜɪʟᴀ ᴘᴏʀᴛᴀᴛɪʟ ᴘᴀʀᴀ ᴛᴜs ᴠɪᴀᴊᴇs!"
+    - " <#FFEFB8>&l★ &7¡ᴜɴᴀ ᴍᴏᴄʜɪʟᴀ ᴘᴏʀᴛᴀᴛɪʟ ᴘᴀʀᴀ ᴛᴜs ᴠɪᴀᴊᴇs!"
     - ""
-    - " &e&l→ ʜᴀᴢ ᴄʟɪᴄ ᴘᴀʀᴀ ʜᴀᴄᴇʀ ᴄʟɪᴄ ᴅᴇʀᴇᴄʜᴏ ʏ ᴀʙʀɪʀʟᴀ"
+    - " <#FF8F8F>&l→ <#FFB09C>&lᴄ<#FFC0A2>&lʟ<#FFD0A9>&lɪ<#FFE0AF>&lᴄ<#FFE1A9>&lᴋ <#FFE49E>&lᴅ<#FFE597>&lᴇ<#FFE691>&lʀ<#F0EB96>&lᴇ<#E1F19A>&lᴄ<#D0F69E>&lʜ<#BEFAA3>&lᴏ <#A3FFB9>&lᴘ<#9EFFCA>&lᴀ<#98FFDB>&lʀ<#93FFEA>&lᴀ <#8AEEFC>&lᴀ<#87DCFE>&lʙ<#84CBFE>&lʀ<#81B9FF>&lɪ<#7EA7FF>&lʀ"
     - "&8&m---------------------------------"
 
 # Ítem del botón para abrir el selector de colores (slot 31 - centro de la fila 4)
@@ -58,7 +60,7 @@ backpack-item:
 color-button:
   material: "PLAYER_HEAD"
   hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWU2NjM2OTI4NWU5OWNmMzdjNDQyM2Y3YWY2ODEyZGRlYjc5MGI5NzQ3NWFhZmJkNTY1MGJlZTQ0N2EyZGE0NyJ9fX0="
-  name: "<gradient:#95a5a6:#7f8c8d>&lᴄᴀᴍʙɪᴀʀ ᴄᴏʟᴏʀ / ᴀsᴘᴇᴄᴛᴏ</gradient>"
+  name: "<#FF8F8F>&lᴄ<#FFA095>&lᴀ<#FFB09C>&lᴍ<#FFC0A2>&lʙ<#FFD0A9>&lɪ<#FFE0AF>&lᴀ<#FFE2A8>&lʀ <#FFE599>&lᴄ<#FFE691>&lᴏ<#F0EB96>&lʟ<#E1F19A>&lᴏ<#D0F69E>&lʀ <#A9FFA7>&l/ <#9BFFD2>&lᴀ<#94FFE7>&lѕ<#8DFFFA>&lᴘ<#8AEEFC>&lᴇ<#87DCFE>&lᴄ<#84CBFE>&lᴛ<#81B9FF>&lᴏ  "
   lore: []
 
 # Ajustes de los botones de navegación de páginas (slots 28 y 34)
@@ -95,25 +97,25 @@ page-buttons:
 
 # Mensajes del plugin (soporta códigos de color)
 messages:
-  prefix: "&7[&bᴍᴏᴄʜɪʟᴀ&7] &r"
+  prefix: "&8[&bʙᴀᴄᴋᴘᴀᴄᴋ&7] &r"
   no-permission: "&cɴᴏ ᴛɪᴇɴᴇs ᴘᴇʀᴍɪsᴏs ᴘᴀʀᴀ ᴜsᴀʀ ᴇsᴛᴇ ᴄᴏᴍᴀɴᴅᴏ."
   only-players: "&cᴇsᴛᴇ ᴄᴏᴍᴀɴᴅᴏ sᴏʟᴏ ᴘᴜᴇᴅᴇ sᴇʀ ᴇᴊᴇᴄᴜᴛᴀᴅᴏ ᴘᴏʀ ᴊᴜɢᴀᴅᴏʀᴇs."
   no-funds: "&cɴᴏ ᴛɪᴇɴᴇs sᴜғɪᴄɪᴇɴᴛᴇ ᴅɪɴᴇʀᴏ. ɴᴇᴄᴇsɪᴛᴀs &e$%cost%&c."
-  slot-unlocked: "&a¡ʜᴀs ᴅᴇsʙʟᴏQᴜᴇᴀᴅᴏ ᴜɴᴀ ɴᴜᴇᴠᴀ ʀᴀɴᴜʀᴀ ᴘᴏʀ &e$%cost%&a!"
-  slot-locked-previous: "&c¡ᴅᴇʙᴇs ᴅᴇsʙʟᴏQᴜᴇᴀʀ ʟᴀs ʀᴀɴᴜʀᴀs ᴀɴᴛᴇʀɪᴏʀᴇs ᴘʀɪᴍᴇʀᴏ!"
+  slot-unlocked: "&a¡ʜᴀѕ ᴅᴇѕʙbʟᴏǫᴜᴇᴀᴅᴏ ᴜɴᴀ ɴᴜᴇᴠᴀ ʀᴀɴᴜʀᴀ ᴘᴏʀ &e$%cost%&a!"
+  slot-locked-previous: "&c¡ᴅᴇѕʙᴇѕ ᴅᴇѕʙʟᴏǫᴜᴇᴀʀ ʟᴀs ʀᴀɴᴜʀᴀs ᴀɴᴛᴇʀɪᴏʀᴇs ᴘʀɪᴍᴇʀᴏ!"
   data-saved: "&aʟᴏs ᴅᴀᴛᴏs ᴅᴇ ᴛᴜ ᴍᴏᴄʜɪʟᴀ ʜᴀɴ sɪᴅᴏ ɢᴜᴀʀᴅᴀᴅᴏs."
   admin-usage: "&eᴜsᴏ: &b/mochila admin [setslots/getslots/addloc/removeloc/reload] ... &oó &b/mochila give [jugador]"
   player-not-found: "&cᴊᴜɢᴀᴅᴏʀ ɴᴏ ᴇɴᴄᴏɴᴛʀᴀᴅᴏ."
   admin-set-success: "&aʜᴀs ᴇsᴛᴀʙʟᴇᴄɪᴅᴏ ʟᴀs ʀᴀɴᴜʀᴀs ᴅᴇ &e%player% &aᴀ &b%slots%&a."
   admin-get-success: "&aᴇʟ ᴊᴜɢᴀᴅᴏʀ &e%player% &aᴛɪᴇɴᴇ &b%slots% &aʀᴀɴᴜʀᴀs ᴅᴇsʙʟᴏQᴜᴇᴀᴅas."
   item-given: "&a¡sᴇ ʜᴀ ᴇɴᴛʀᴇɢᴀᴅᴏ ʟᴀ ᴍᴏᴄʜɪʟᴀ ᴀ &e%player%&a!"
-  skin-found: "&a¡ғᴇʟɪᴄɪᴅᴀᴅᴇs! ʜᴀs ᴇɴᴄᴏɴᴛʀᴀᴅᴏ ʟᴀ %skin_name%&a. ¡ᴀʜᴏʀᴀ ʟᴀ ᴛɪᴇɴᴇs ᴅᴇsʙʟᴏQᴜᴇᴀᴅᴀ!"
-  skin-already-found: "&cʏᴀ ʜᴀʙɪᴀs ᴅᴇsʙʟᴏQᴜᴇᴀᴅᴏ ᴇsᴛᴇ ᴀsᴘᴇᴄᴛᴏ ᴀɴᴛᴇʀɪᴏʀᴍᴇɴᴛe."
-  skin-locked-find: "&cᴅᴇʙᴇs ᴇɴᴄᴏɴᴛʀᴀʀ ᴇsᴛᴇ ᴀsᴘᴇᴄᴛᴏ ᴇsᴄᴏɴᴅɪᴅᴏ ᴇɴ ᴇʟ ᴍᴀᴘᴀ ᴘᴀʀᴀ ᴅᴇsʙʟᴏQᴜᴇᴀʀʟᴏ."
+  skin-found: "&a¡ғᴇʟɪᴄɪᴅᴀᴅᴇs! ʜᴀs ᴇɴᴄᴏɴᴛʀᴀᴅᴏ ʟᴀ %skin_name%&a. ¡ᴀʜᴏʀᴀ ʟᴀ ᴛɪᴇɴᴇs ᴅᴇsʙbʟᴏQᴜᴇᴀᴅᴀ!"
+  skin-already-found: "&cʏᴀ  ʜᴀʙɪᴀѕ ᴅᴇѕʙʟᴏǫᴜᴇᴀᴅᴏ ᴇѕᴛᴇ ᴀѕᴘᴇᴄᴛᴏ ᴀɴᴛᴇʀɪᴏʀᴍᴇɴᴛᴇ ."
+  skin-locked-find: "&cᴅᴇʙᴇs ᴇɴᴄᴏɴᴛʀᴀʀ ᴇsᴛᴇ ᴀsᴘᴇᴄᴛᴏ ᴇsᴄᴏɴᴅɪᴅᴏ ᴇɴ ᴇʟ ᴍᴀᴘᴀ ᴘᴀʀᴀ ᴅᴇsʙb501ʟᴏQᴜᴇᴀʀʟᴏ."
   skin-equipped: "&a¡ʜᴀs ᴇϙᴜɪᴘᴀᴅᴏ ᴇʟ ᴀsᴘᴇᴄᴛᴏ %skin_name%&a!"
-  loc-added: "&aᴜʙɪᴄᴀᴄɪᴏɴ ʀᴇɢɪsᴛʀᴀᴅᴀ ᴄᴏᴍᴏ ᴘᴜɴᴛᴏ ᴅᴇ ᴅᴇsʙʟᴏQᴜᴇᴀʀ ᴘᴀʀᴀ %skin_name%&a."
-  loc-removed: "&cᴜʙɪᴄᴀᴄɪᴏɴ ᴇʟɪᴍɪɴᴀᴅᴀ ᴄᴏᴍᴏ ᴘᴜɴᴛᴏ ᴅᴇ ᴅᴇsʙʟᴏQᴜᴇᴏ."
-  no-block-looking: "&cᴅᴇʙᴇs ᴇsᴛᴀʀ ᴍɪʀᴀɴᴅᴏ ᴜɴ ʙʟᴏϙᴜᴇ ᴘᴀʀᴀ ʜᴀᴄᴇʀ ᴇsᴛᴏ."
+  loc-added: "&aᴜʙɪᴄᴀᴄɪᴏɴ ʀᴇɢɪsᴛʀᴀᴅᴀ ᴄᴏᴍᴏ ᴘᴜɴᴛᴏ ᴅᴇ ᴅᴇsʙbʟᴏQᴜᴇᴀʀ ᴘᴀʀᴀ %skin_name%&a."
+  loc-removed: "&c... &c."
+  no-block-looking: "&c... &c."
   no-loc-here: "&cɴᴏ ʜᴀʏ ɴɪɴɢᴜɴᴀ ᴍᴏᴄʜɪʟᴀ ʀᴇɢɪsᴛʀᴀᴅᴀ ᴇɴ ᴇsᴛᴇ ʙʟᴏϙᴜᴇ."
 
 # Sonidades de la interfaz al comprar/interactuar
@@ -133,17 +135,16 @@ items:
     lore:
       - "&8&m---------------------------------"
       - " &7¡ᴇsᴛᴀ ʀᴀɴᴜʀᴀ ᴇsᴛᴀ ʙʟᴏQᴜᴇᴀᴅᴀ!"
-      - " &7ᴄᴏsᴛᴏ ᴘᴀʀᴀ ᴅᴇsʙʟᴏQᴜᴇᴀʀ: &a$%cost%"
+      - " &7ᴄᴏsᴛᴏ ᴘᴀʀᴀ ᴅᴇsʙbʟᴏQᴜᴇᴀʀ: &a$%cost%"
       - ""
-      - " &e&l→ ʜᴀᴢ ᴄʟɪᴄ ᴘᴀʀᴀ ᴅᴇsʙʟᴏQᴜᴇᴀʀ"
+      - " &e&l→ ʜᴀᴢ ᴄʟɪᴄ ᴘᴀʀᴀ ᴅᴇsʙbʟᴏQᴜᴇᴀʀ"
       - "&8&m---------------------------------"
   locked-future:
     material: "GRAY_STAINED_GLASS_PANE"
     name: "&8&lʀᴀɴᴜʀᴀ ʙʟᴏQᴜᴇᴀᴅᴀ"
     lore:
       - "&8&m---------------------------------"
-      - " &7¡ᴅᴇʙᴇs ᴅᴇsʙʟᴏQᴜᴇᴀʀ ʟᴀs ʀᴀɴᴜʀᴀs"
-      - " &7ᴀɴᴛᴇʀɪᴏʀᴇs ᴀɴᴛᴇs ᴅᴇ ᴄᴏᴍᴘʀᴀʀ ᴇsᴛᴀ!"
+      - " &7¡... &7...!"
       - "&8&m---------------------------------"
 
 # Costo para desbloquear cada slot.
@@ -183,49 +184,49 @@ unlock-costs:
 backpack-skins:
   gray:
     hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzNjMGJmYTg3NWFiOGI4M2Q4ZDk1MTk3NzRjNmM3YzQ1YWQ5YTg4NDNmNjhhNGE1YzAwMDM3NDMyNjBlMmVjNSJ9fX0="
-    name: "<gradient:#95a5a6:#7f8c8d>&lᴍᴏᴄʜɪʟᴀ</gradient>"
+    name: "<gradient:#95a5a6:#7f8c8d>&lʙᴀᴄᴋᴘᴀᴄᴋ</gradient>"
     particle-color: "128,128,128"
   brown:
-    hdb-id: "32286"
-    name: "<gradient:#e67e22:#d35400>&lᴍᴏᴄʜɪʟᴀ ᴍᴀʀʀᴏɴ</gradient>"
+    hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjMwOGJmNWNjM2U5ZGVjYWYwNzcwYzNmZGFkMWUwNDIxMjFjZjM5Y2MyNTA1YmJiODY2ZTE4YzZkMjNjY2QwYyJ9fX0="
+    name: "<gradient:#e67e22:#d35400>&lʙᴀᴄᴋᴘᴀᴄᴋ ᴍᴀʀʀᴏɴ</gradient>"
     particle-color: "139,69,19"
   darkgreen:
-    hdb-id: "32287"
-    name: "<gradient:#27ae60:#1e5f37>&lᴍᴏᴄʜɪʟᴀ ᴠᴇʀᴅᴇ ᴏsᴄᴜʀᴏ</gradient>"
+    hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2ZkMTcwNDAwOGJjNjgzZGM4ZTZlOGZmN2MxMGUwY2YyNGQ3MmI4ZjMwNmRlMjYzMWUzZmViZmRlNjQ5MWM0ZCJ9fX0="
+    name: "<gradient:#27ae60:#1e5f37>&lʙᴀᴄᴋᴘᴀᴄᴋ ᴠᴇʀᴅᴇ ᴏsᴄᴜʀᴏ</gradient>"
     particle-color: "34,139,34"
   green:
-    hdb-id: "32280"
-    name: "<gradient:#2ecc71:#27ae60>&lᴍᴏᴄʜɪʟᴀ ᴠᴇʀᴅᴇ</gradient>"
+    hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjIxMjhmNDhkOTk3MTg2NTYzZmJjNWI0N2E4OGMwZDBhYWM5MmZhMmMyODVjZDFmYWU0MjBjMzRmYThmMjAxMCJ9fX0="
+    name: "<gradient:#2ecc71:#27ae60>&lʙᴀᴄᴋᴘᴀᴄᴋ ᴠᴇʀᴅᴇ</gradient>"
     particle-color: "50,205,50"
   orange:
-    hdb-id: "32278"
-    name: "<gradient:#ff9f43:#ff6b6b>&lᴍᴏᴄʜɪʟᴀ ɴᴀʀᴀɴᴊᴀ</gradient>"
+    hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjcwYjU2MjJiN2QwNjhmNTc4OGJmMTlhODM5ODM5MzdiMTZjNTk3MmM5MWY1ZWU3YmY1NGJjYzM2MzhmOWEzNiJ9fX0="
+    name: "<gradient:#ff9f43:#ff6b6b>&lʙᴀᴄᴋᴘᴀᴄᴋ ɴᴀʀᴀɴᴊᴀ</gradient>"
     particle-color: "255,127,0"
   purple:
-    hdb-id: "32283"
-    name: "<gradient:#9b59b6:#8e44ad>&lᴍᴏᴄʜɪʟᴀ ᴘᴜʀᴘᴜʀᴀ</gradient>"
+    hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjE4N2M3MzJhYTM5ZDI5MTM0NjUwYjZhNzJjNmY0MWI5OTA4NWEyNmVjNWU1MTNiYTE4YzQwZDVlY2E5ZTY5YyJ9fX0="
+    name: "<gradient:#9b59b6:#8e44ad>&lʙᴀᴄᴋᴘᴀᴄᴋ ᴘᴜʀᴘᴜʀᴀ</gradient>"
     particle-color: "186,85,211"
   pink:
-    hdb-id: "32277"
-    name: "<gradient:#ff9ff3:#feca57>&lᴍᴏᴄʜɪʟᴀ ʀᴏsᴀ</gradient>"
+    hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmUwODdjZDk3NWQyNjRjNzJhZGNhOWVmYzZmYzM0NDc2ZWMzOGUxOGRmNTM2YjMwNzYzNTI2N2EzN2ZhZjA3NiJ9fX0="
+    name: "<#F5B8FF>&lʙ<#F5A8F0>&lᴀ<#F398E0>&lᴄ<#F288D1>&lᴋ<#EF77C2>&lᴘ<#EC65B4>&lᴀ<#E952A5>&lᴄ<#E53B97>&lᴋ &lʀ&lᴏ&ls&lᴀ"
     particle-color: "255,105,180"
   blue:
-    hdb-id: "32279"
-    name: "<gradient:#3498db:#2980b9>&lᴍᴏᴄʜɪʟᴀ ᴀᴢᴜʟ</gradient>"
+    hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2U1YWJkYjczNzQ1NTNkMDU2NWNiY2IzMjk1YWVkNTE1YTg5N2ViY2U5ZTBiYzYwZjFjMWY4YWU1NGM3NDlkZiJ9fX0="
+    name: "<gradient:#3498db:#2980b9>&lʙᴀᴄᴋᴘᴀᴄᴋ ᴀᴢᴜʟ</gradient>"
     particle-color: "0,191,255"
   red:
-    hdb-id: "32285"
-    name: "<gradient:#e74c3c:#c0392b>&lᴍᴏᴄʜɪʟᴀ ʀᴏᴊᴀ</gradient>"
+    hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmNlMDE2OTlmNzk2Y2JkZTk1Yzg0OWJlZTNjYzM2OTg3ODQ1MmI0MGE0MTE0NDM2NmQ2NmI0YTA4MjZjZmFhMCJ9fX0="
+    name: "<gradient:#e74c3c:#c0392b>&lʙᴀᴄᴋᴘᴀᴄᴋ ʀᴏᴊᴀ</gradient>"
     particle-color: "255,0,0"
   white:
-    hdb-id: "32275"
-    name: "<gradient:#ffffff:#bdc3c7>&lᴍᴏᴄʜɪʟᴀ ʙʟᴀɴᴄᴀ</gradient>"
+    hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTJiYjM4NTE2YjI5NTA0MTg2ZTExNTU5Y2Q1MjUwYWUyMThkYjRkZGQyN2FlNDM4NzI2Yzg0N2NlNmIzYzk4In19fQ=="
+    name: "<gradient:#ffffff:#bdc3c7>&lʙᴀᴄᴋᴘᴀᴄᴋ ʙʟᴀɴᴄᴀ</gradient>"
     particle-color: "240,240,240"
   yellow:
-    hdb-id: "32284"
-    name: "<gradient:#f1c40f:#f39c12>&lᴍᴏᴄʜɪʟᴀ ᴀᴍᴀʀɪʟʟᴀ</gradient>"
+    hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTFiYmJjNWMyNDM4NGVjYjJmNjg0NGRhMjg1Y2NjZjllYjAxMWM3YTY2NzAxNzdjZjc1Y2Q2NTUxM2JjMTI3NCJ9fX0="
+    name: "<gradient:#f1c40f:#f39c12>&lʙᴀᴄᴋᴘᴀᴄᴋ ᴀᴍᴀʀɪʟʟᴀ</gradient>"
     particle-color: "255,215,0"
   darkblue:
-    hdb-id: "32288"
-    name: "<gradient:#2c3e50:#34495e>&lᴍᴏᴄʜɪʟᴀ ᴀᴢᴜʟ ᴏsᴄᴜʀᴏ</gradient>"
+    hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGRjYzZlYjQwZjNiYWRhNDFlNDMzOTg4OGQ2ZDIwNzQzNzU5OGJkYmQxNzVjMmU3MzExOTFkNWE5YTQyZDNjOCJ9fX0="
+    name: "<gradient:#2c3e50:#34495e>&lʙᴀᴄᴋᴘᴀᴄᴋ ᴀᴢᴜʟ ᴏsᴄᴜʀᴏ</gradient>"
     particle-color: "0,0,139"
