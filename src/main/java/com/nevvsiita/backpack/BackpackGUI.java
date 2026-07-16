@@ -146,7 +146,7 @@ public class BackpackGUI {
         if (meta != null) {
             meta.setDisplayName(translateColors(config.getString("upgrade-button.name", "&6&lᴍᴇᴊᴏʀᴀʀ ᴇsᴘᴀᴄɪᴏ")));
             List<String> lore = new ArrayList<>();
-            if (currentRows >= 3) {
+            if (currentRows >= 5) {
                 List<String> maxLore = config.getStringList("upgrade-button.lore-maxed");
                 for (String line : maxLore) {
                     lore.add(translateColors(line));
@@ -155,7 +155,16 @@ public class BackpackGUI {
                 int nextRows = currentRows + 1;
                 int currentSlots = currentRows * 9;
                 int nextSlots = nextRows * 9;
-                int cost = nextRows == 2 ? config.getInt("upgrade-button.cost-row-2", 5000) : config.getInt("upgrade-button.cost-row-3", 15000);
+                int cost;
+                if (nextRows == 2) {
+                    cost = config.getInt("upgrade-button.cost-row-2", 400000);
+                } else if (nextRows == 3) {
+                    cost = config.getInt("upgrade-button.cost-row-3", 800000);
+                } else if (nextRows == 4) {
+                    cost = config.getInt("upgrade-button.cost-row-4", 1200000);
+                } else {
+                    cost = config.getInt("upgrade-button.cost-row-5", 1600000);
+                }
 
                 List<String> upLore = config.getStringList("upgrade-button.lore");
                 for (String line : upLore) {
@@ -182,11 +191,11 @@ public class BackpackGUI {
         BackpackManager.BackpackData data = plugin.getBackpackManager().getBackpack(uuid);
         FileConfiguration config = plugin.getConfig();
 
-        int unlockedRows = data.getUnlockedSlots(); // 1, 2 o 3
+        int unlockedRows = data.getUnlockedSlots(); // 1 a 5
         if (unlockedRows < 1) unlockedRows = 1;
-        if (unlockedRows > 3) unlockedRows = 3;
+        if (unlockedRows > 5) unlockedRows = 5;
 
-        int size = (unlockedRows + 1) * 9; // e.g. 18, 27 o 36
+        int size = (unlockedRows + 1) * 9; // e.g. 18, 27, 36, 45, 54
 
         String title = config.getString("gui.title", "<gradient:#a18cd1:#fa97c4>&lᴍᴏᴄʜɪʟᴀ</gradient> %player%");
         title = title.replace("%player%", player.getName());
@@ -197,11 +206,11 @@ public class BackpackGUI {
 
         int storageSlots = unlockedRows * 9;
 
-        // Cargar los items de la mochila respetando ranuras desbloqueadas
-        ItemStack[] ecContents = player.getEnderChest().getContents();
+        // Cargar los items de la mochila desde los datos del jugador (página 1)
         for (int i = 0; i < storageSlots; i++) {
-            if (i < ecContents.length && ecContents[i] != null) {
-                inventory.setItem(i, ecContents[i].clone());
+            ItemStack item = data.getItem(1, i);
+            if (item != null) {
+                inventory.setItem(i, item.clone());
             }
         }
 

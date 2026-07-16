@@ -62,6 +62,8 @@ upgrade-button:
   name: "<#FFE0AF>&lᴍᴇᴊᴏʀᴀʀ ᴄᴀᴘᴀᴄɪᴅᴀᴅ</gradient>"
   cost-row-2: 400000
   cost-row-3: 800000
+  cost-row-4: 1200000
+  cost-row-5: 1600000
   lore:
     - "&8&m---------------------------------"
     - " &7¡Mejora la capacidad de tu mochila!"
@@ -76,7 +78,7 @@ upgrade-button:
     - "&8&m---------------------------------"
     - " &7¡Mejora la capacidad de tu mochila!"
     - ""
-    - " &fCapacidad actual: &e3 Filas (27 slots)"
+    - " &fCapacidad actual: &e5 Filas (45 slots)"
     - " &a&l¡Capacidad máxima alcanzada!"
     - "&8&m---------------------------------"
 

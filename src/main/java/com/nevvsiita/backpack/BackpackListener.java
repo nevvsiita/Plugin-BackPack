@@ -351,15 +351,15 @@ public class BackpackListener implements Listener {
         int unlockedRows = data.getUnlockedSlots();
         int storageSlots = unlockedRows * 9;
 
-        // Guardar ítems de los slots de almacenamiento de la GUI al Ender Chest
-        ItemStack[] enderChestContents = player.getEnderChest().getContents();
-        for (int i = 0; i < 27; i++) {
-            if (i < storageSlots) {
-                ItemStack item = inventory.getItem(i);
-                enderChestContents[i] = (item != null && item.getType() != org.bukkit.Material.AIR) ? item.clone() : null;
+        // Guardar ítems de los slots de almacenamiento de la GUI al playerdata (página 1)
+        data.clearPage(1);
+        for (int i = 0; i < storageSlots; i++) {
+            ItemStack item = inventory.getItem(i);
+            if (item != null && item.getType() != org.bukkit.Material.AIR) {
+                data.setItem(1, i, item.clone());
             }
         }
-        player.getEnderChest().setContents(enderChestContents);
+        plugin.getBackpackManager().saveBackpack(player.getUniqueId());
 
         // Sonido de cierre
         String soundName = plugin.getConfig().getString("sounds.close-backpack", "BLOCK_CHEST_CLOSE");
@@ -534,14 +534,23 @@ public class BackpackListener implements Listener {
 
     private void tryUpgradeBackpack(Player player, BackpackManager.BackpackData data, BackpackGUI.BackpackHolder holder) {
         int currentRows = data.getUnlockedSlots();
-        if (currentRows >= 3) {
+        if (currentRows >= 5) {
             playConfigSound(player, "sounds.unlock-fail", "ENTITY_VILLAGER_NO");
             return;
         }
 
         int nextRows = currentRows + 1;
         FileConfiguration config = plugin.getConfig();
-        int cost = nextRows == 2 ? config.getInt("upgrade-button.cost-row-2", 5000) : config.getInt("upgrade-button.cost-row-3", 15000);
+        int cost;
+        if (nextRows == 2) {
+            cost = config.getInt("upgrade-button.cost-row-2", 400000);
+        } else if (nextRows == 3) {
+            cost = config.getInt("upgrade-button.cost-row-3", 800000);
+        } else if (nextRows == 4) {
+            cost = config.getInt("upgrade-button.cost-row-4", 1200000);
+        } else {
+            cost = config.getInt("upgrade-button.cost-row-5", 1600000);
+        }
 
         // Verificar dinero usando Vault
         if (plugin.getVaultHook() != null && plugin.getVaultHook().hasEconomy()) {
