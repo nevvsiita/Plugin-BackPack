@@ -1,4 +1,4 @@
-package com.ainar.backpack;
+package com.nevvsiita.backpack;
 
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;

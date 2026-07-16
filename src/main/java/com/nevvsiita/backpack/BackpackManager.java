@@ -1,4 +1,4 @@
-package com.ainar.backpack;
+package com.nevvsiita.backpack;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;

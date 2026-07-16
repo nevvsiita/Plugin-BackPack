@@ -1,6 +1,6 @@
 name: BackPack
 version: ${project.version}
-main: com.ainar.backpack.BackPackPlugin
+main: com.nevvsiita.backpack.BackPackPlugin
 api-version: '1.16'
 softdepend: [Vault, HeadDatabase]
 commands:

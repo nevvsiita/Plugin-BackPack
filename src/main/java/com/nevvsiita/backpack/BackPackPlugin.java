@@ -1,4 +1,4 @@
-package com.ainar.backpack;
+package com.nevvsiita.backpack;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
