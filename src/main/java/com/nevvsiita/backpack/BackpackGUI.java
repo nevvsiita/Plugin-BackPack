@@ -215,11 +215,13 @@ public class BackpackGUI {
             }
         }
 
-        // Llenar la última fila con el botón del selector de color, el botón de mejoras y separadores
+        // Llenar la última fila con el botón de visibilidad, el botón del selector de color, el botón de mejoras y separadores
         int controlStart = storageSlots;
         for (int i = controlStart; i < size; i++) {
             int relative = i - controlStart;
-            if (relative == 4) {
+            if (relative == 2) {
+                inventory.setItem(i, createVisibilityButton(data.isShowDisplay()));
+            } else if (relative == 4) {
                 inventory.setItem(i, createColorButton());
             } else if (relative == 6) {
                 inventory.setItem(i, createUpgradeButton(unlockedRows));
@@ -285,7 +287,9 @@ public class BackpackGUI {
         int controlStart = storageSlots;
         for (int i = controlStart; i < size; i++) {
             int relative = i - controlStart;
-            if (relative == 4) {
+            if (relative == 2) {
+                inventory.setItem(i, createVisibilityButton(data.isShowDisplay()));
+            } else if (relative == 4) {
                 inventory.setItem(i, createColorButton());
             } else if (relative == 6) {
                 inventory.setItem(i, createUpgradeButton(unlockedRows));
@@ -509,6 +513,47 @@ public class BackpackGUI {
             meta.setDisplayName(translateColors(name));
 
             List<String> lore = config.getStringList("color-button.lore");
+            List<String> coloredLore = new ArrayList<>();
+            for (String line : lore) {
+                coloredLore.add(translateColors(line));
+            }
+            meta.setLore(coloredLore);
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
+    private ItemStack createVisibilityButton(boolean show) {
+        FileConfiguration config = plugin.getConfig();
+        String path = show ? "gui.visibility-button.show" : "gui.visibility-button.hide";
+        String materialName = config.getString(path + ".material", "PLAYER_HEAD");
+        
+        ItemStack item;
+        if (materialName.equalsIgnoreCase("PLAYER_HEAD") && config.contains(path + ".hdb-id")) {
+            String hdbId = config.getString(path + ".hdb-id");
+            ItemStack head = null;
+            if (plugin.getHdbHook() != null) {
+                head = plugin.getHdbHook().getHead(hdbId);
+            }
+            if (head != null) {
+                item = head;
+            } else {
+                item = new ItemStack(Material.PLAYER_HEAD);
+            }
+        } else {
+            Material mat = Material.matchMaterial(materialName);
+            if (mat == null) {
+                mat = Material.PLAYER_HEAD;
+            }
+            item = new ItemStack(mat);
+        }
+
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            String name = config.getString(path + ".name", show ? "&aVisualización: &lMOSTRAR" : "&cVisualización: &lOCULTAR");
+            meta.setDisplayName(translateColors(name));
+
+            List<String> lore = config.getStringList(path + ".lore");
             List<String> coloredLore = new ArrayList<>();
             for (String line : lore) {
                 coloredLore.add(translateColors(line));

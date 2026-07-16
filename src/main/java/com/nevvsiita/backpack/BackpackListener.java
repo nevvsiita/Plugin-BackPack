@@ -13,6 +13,13 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -154,7 +161,21 @@ public class BackpackListener implements Listener {
                     // Botón de control o separador
                     event.setCancelled(true);
                     int relative = slot - storageSlots;
-                    if (relative == 4) {
+                    if (relative == 2) {
+                        // Cambiar visibilidad
+                        boolean newVisibility = !data.isShowDisplay();
+                        data.setShowDisplay(newVisibility);
+                        plugin.getBackpackManager().saveBackpack(player.getUniqueId());
+                        
+                        // Sonido de equipar
+                        playConfigSound(player, "sounds.equip-skin", "ITEM_ARMOR_EQUIP_LEATHER");
+                        
+                        // Refrescar GUI
+                        plugin.getBackpackGUI().openGUI(player, holder.getBackpackItem(), holder.getSlot());
+                        
+                        // Actualizar display
+                        plugin.getBackpackDisplayManager().updateDisplay(player);
+                    } else if (relative == 4) {
                         // Abrir el selector de skins
                         plugin.getBackpackGUI().openSkinSelector(player, holder.getBackpackItem(), holder.getSlot());
                     } else if (relative == 6) {
@@ -641,5 +662,85 @@ public class BackpackListener implements Listener {
 
     private String translateColors(String text) {
         return BackpackGUI.translateColors(text);
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        plugin.getBackpackDisplayManager().updateDisplay(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        plugin.getBackpackDisplayManager().updateDisplay(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+        plugin.getBackpackDisplayManager().updateDisplay(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
+        org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
+            plugin.getBackpackDisplayManager().updateDisplay(event.getPlayer());
+        });
+    }
+
+    @EventHandler
+    public void onInventoryClickDisplayUpdate(InventoryClickEvent event) {
+        if (event.getWhoClicked() instanceof Player) {
+            Player player = (Player) event.getWhoClicked();
+            org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
+                plugin.getBackpackDisplayManager().updateDisplay(player);
+            });
+        }
+    }
+
+    @EventHandler
+    public void onInventoryDragDisplayUpdate(InventoryDragEvent event) {
+        if (event.getWhoClicked() instanceof Player) {
+            Player player = (Player) event.getWhoClicked();
+            org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
+                plugin.getBackpackDisplayManager().updateDisplay(player);
+            });
+        }
+    }
+
+    @EventHandler
+    public void onInventoryCloseDisplayUpdate(InventoryCloseEvent event) {
+        if (event.getPlayer() instanceof Player) {
+            Player player = (Player) event.getPlayer();
+            org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
+                plugin.getBackpackDisplayManager().updateDisplay(player);
+            });
+        }
+    }
+
+    @EventHandler
+    public void onPlayerDropItem(PlayerDropItemEvent event) {
+        Player player = event.getPlayer();
+        org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
+            plugin.getBackpackDisplayManager().updateDisplay(player);
+        });
+    }
+
+    @EventHandler
+    public void onEntityPickupItem(EntityPickupItemEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
+                plugin.getBackpackDisplayManager().updateDisplay(player);
+            });
+        }
+    }
+
+    @EventHandler
+    public void onEntityPotionEffect(EntityPotionEffectEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
+                plugin.getBackpackDisplayManager().updateDisplay(player);
+            });
+        }
     }
 }

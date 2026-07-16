@@ -74,6 +74,7 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
             String activeSkin = plugin.getBackpackManager().getBackpack(target.getUniqueId()).getActiveSkin();
             ItemStack backpackItem = createBackpackItem(activeSkin);
             target.getInventory().addItem(backpackItem);
+            plugin.getBackpackDisplayManager().updateDisplay(target);
             
             String givenMsg = getMsg("messages.item-given").replace("%player%", target.getName());
             sender.sendMessage(prefix + givenMsg);
@@ -259,6 +260,7 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
 
                 // Forzar actualización física del item en la mano del jugador
                 updatePhysicalBackpacks(target, "gray");
+                plugin.getBackpackDisplayManager().updateDisplay(target);
 
                 sender.sendMessage(prefix + BackpackGUI.translateColors("&aHas restablecido los colores desbloqueados de &e" + target.getName() + " &aal estado por defecto (Solo Gris)."));
                 return true;
@@ -295,6 +297,7 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                     updatePhysicalBackpacks(target, "gray");
                 }
                 plugin.getBackpackManager().saveBackpack(targetUUID);
+                plugin.getBackpackDisplayManager().updateDisplay(target);
 
                 sender.sendMessage(prefix + BackpackGUI.translateColors("&cHas bloqueado/quitado el aspecto &e" + colorKey + " &cpara &b" + target.getName() + "&c."));
                 return true;

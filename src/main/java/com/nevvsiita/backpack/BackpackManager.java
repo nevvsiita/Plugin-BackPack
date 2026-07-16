@@ -64,6 +64,10 @@ public class BackpackManager {
             }
             data.setUnlockedSkins(unlockedSkins);
 
+            // Visibilidad
+            boolean showDisplay = config.getBoolean("show-display", true);
+            data.setShowDisplay(showDisplay);
+
             // Cargar ítems guardados por páginas
             ConfigurationSection itemsSection = config.getConfigurationSection("items");
             if (itemsSection != null) {
@@ -125,6 +129,7 @@ public class BackpackManager {
         config.set("unlocked-slots", data.getUnlockedSlots());
         config.set("active-skin", data.getActiveSkin());
         config.set("unlocked-skins", data.getUnlockedSkins());
+        config.set("show-display", data.isShowDisplay());
         
         // Limpiamos la sección anterior de ítems
         config.set("items", null);
@@ -174,6 +179,7 @@ public class BackpackManager {
         private String activeSkin = "gray";
         private List<String> unlockedSkins = new ArrayList<>();
         private final Map<Integer, Map<Integer, ItemStack>> itemsByPage = new HashMap<>();
+        private boolean showDisplay = true;
 
         public BackpackData(UUID playerUUID) {
             this.playerUUID = playerUUID;
@@ -247,6 +253,14 @@ public class BackpackManager {
 
         public void clearAll() {
             itemsByPage.clear();
+        }
+
+        public boolean isShowDisplay() {
+            return showDisplay;
+        }
+
+        public void setShowDisplay(boolean showDisplay) {
+            this.showDisplay = showDisplay;
         }
     }
 }

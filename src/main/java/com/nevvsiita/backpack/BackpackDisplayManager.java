@@ -24,6 +24,9 @@ public class BackpackDisplayManager {
 
     private final BackPackPlugin plugin;
     private final Map<UUID, ItemDisplay> activeDisplays = new HashMap<>();
+    private final Map<UUID, Location> lastLocations = new HashMap<>();
+    private final Map<UUID, Double> smoothedVx = new HashMap<>();
+    private final Map<UUID, Double> smoothedVz = new HashMap<>();
     private final NamespacedKey backpackKey;
 
     public BackpackDisplayManager(BackPackPlugin plugin) {
@@ -41,28 +44,26 @@ public class BackpackDisplayManager {
                 }
             }
         }.runTaskTimer(plugin, 1L, 1L);
-
-        // Tarea de verificación de inventarios y estado (cada 20 ticks / 1 segundo)
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    updateDisplay(player);
-                }
-            }
-        }.runTaskTimer(plugin, 20L, 20L);
     }
 
     public void updateDisplay(Player player) {
         UUID uuid = player.getUniqueId();
         FileConfiguration config = plugin.getConfig();
 
-        // 1. Si está deshabilitado, invisible, vanished, o no tiene mochila, retirar
+        // 1. Si está deshabilitado, invisible, vanished, muerto, en espectador o no tiene mochila, retirar
         boolean enabled = config.getBoolean("backpack-display.enabled", true);
-        boolean isVanished = player.hasMetadata("vanished") || player.hasPotionEffect(PotionEffectType.INVISIBILITY);
+        
+        // Obtener la preferencia de visibilidad del jugador
+        BackpackManager.BackpackData data = plugin.getBackpackManager().getBackpack(uuid);
+        boolean showDisplay = data.isShowDisplay();
+
+        boolean isVanished = player.hasMetadata("vanished") 
+                || player.hasPotionEffect(PotionEffectType.INVISIBILITY)
+                || player.getGameMode() == org.bukkit.GameMode.SPECTATOR
+                || player.isDead();
         ItemStack backpack = findBackpack(player);
 
-        if (!enabled || isVanished || backpack == null) {
+        if (!enabled || !showDisplay || isVanished || backpack == null) {
             removeDisplay(player);
             return;
         }
@@ -97,14 +98,36 @@ public class BackpackDisplayManager {
             return;
         }
 
-        // Si cambió de mundo, teletransportarlo al instante al nuevo mundo
+        // Si cambió de mundo, recrear el display para evitar bugs interdimensionales
         if (!player.getWorld().equals(display.getWorld())) {
-            display.teleport(player.getLocation());
+            removeDisplay(player);
+            updateDisplay(player);
             return;
         }
 
+        Location prevLoc = lastLocations.get(uuid);
+        Location currLoc = player.getLocation();
+        lastLocations.put(uuid, currLoc.clone());
+
+        double vx = 0;
+        double vz = 0;
+
+        if (prevLoc != null && prevLoc.getWorld().equals(currLoc.getWorld())) {
+            vx = currLoc.getX() - prevLoc.getX();
+            vz = currLoc.getZ() - prevLoc.getZ();
+        }
+
+        // Filtro de suavizado (Promedio móvil exponencial con factor 0.6 para suavidad)
+        double lastVx = smoothedVx.getOrDefault(uuid, 0.0);
+        double lastVz = smoothedVz.getOrDefault(uuid, 0.0);
+        double alpha = 0.6;
+        double currentVx = lastVx + alpha * (vx - lastVx);
+        double currentVz = lastVz + alpha * (vz - lastVz);
+        smoothedVx.put(uuid, currentVx);
+        smoothedVz.put(uuid, currentVz);
+
         FileConfiguration config = plugin.getConfig();
-        double yaw = player.getLocation().getYaw();
+        double yaw = currLoc.getYaw();
         double yawRad = Math.toRadians(yaw);
 
         // Vector unitario que apunta hacia adelante del jugador (solo YAW, ignorando PITCH)
@@ -117,14 +140,19 @@ public class BackpackDisplayManager {
 
         // Cargar offsets de la configuración
         double ox = config.getDouble("backpack-display.position.x", 0.0);
-        // Altura fija respecto al torso (0.9 bloques sobre los pies del jugador)
-        double oy = 0.9 + config.getDouble("backpack-display.position.y", 0.0);
-        double oz = config.getDouble("backpack-display.position.z", -0.22);
+        // Altura fija respecto al torso (1.09 bloques sobre los pies del jugador)
+        double oy = 1.09 + config.getDouble("backpack-display.position.y", 0.0);
+        double oz = config.getDouble("backpack-display.position.z", -0.28);
 
-        // Calcular posición final en base al YAW del cuerpo
-        double finalX = player.getLocation().getX() + (frontX * oz) + (rightX * ox);
-        double finalY = player.getLocation().getY() + oy;
-        double finalZ = player.getLocation().getZ() + (frontZ * oz) + (rightZ * ox);
+        // Compensación de retraso de renderizado horizontal suavizada (excluyendo el eje Y vertical)
+        double lagComp = config.getDouble("backpack-display.lag-compensation", 1.5);
+        double compX = currentVx * lagComp;
+        double compZ = currentVz * lagComp;
+
+        // Calcular posición final en base al YAW del cuerpo y la compensación de lag suavizada
+        double finalX = currLoc.getX() + (frontX * oz) + (rightX * ox) + compX;
+        double finalY = currLoc.getY() + oy; // Sin compensación vertical para evitar rebotes al saltar/caer
+        double finalZ = currLoc.getZ() + (frontZ * oz) + (rightZ * ox) + compZ;
 
         // Crear localización fijando el PITCH (inclinación) en 0.0f para que nunca se mueva adelante/atrás al mirar arriba/abajo
         Location targetLoc = new Location(
@@ -190,6 +218,9 @@ public class BackpackDisplayManager {
 
     public void removeDisplay(Player player) {
         UUID uuid = player.getUniqueId();
+        lastLocations.remove(uuid);
+        smoothedVx.remove(uuid);
+        smoothedVz.remove(uuid);
         ItemDisplay display = activeDisplays.remove(uuid);
         if (display != null) {
             display.remove();
@@ -203,6 +234,9 @@ public class BackpackDisplayManager {
             }
         }
         activeDisplays.clear();
+        lastLocations.clear();
+        smoothedVx.clear();
+        smoothedVz.clear();
     }
 
     private ItemStack findBackpack(Player player) {
