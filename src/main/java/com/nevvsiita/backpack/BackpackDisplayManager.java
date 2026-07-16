@@ -63,7 +63,12 @@ public class BackpackDisplayManager {
                 || player.isDead();
         ItemStack backpack = findBackpack(player);
 
-        if (!enabled || !showDisplay || isVanished || backpack == null) {
+        // Verificar si el jugador tiene la mochila en la mano (principal o secundaria)
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
+        ItemStack offHand = player.getInventory().getItemInOffHand();
+        boolean holdingBackpack = isBackpackItem(mainHand) || isBackpackItem(offHand);
+
+        if (!enabled || !showDisplay || isVanished || backpack == null || holdingBackpack) {
             removeDisplay(player);
             return;
         }

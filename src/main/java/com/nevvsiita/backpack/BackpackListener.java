@@ -18,6 +18,8 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -742,5 +744,21 @@ public class BackpackListener implements Listener {
                 plugin.getBackpackDisplayManager().updateDisplay(player);
             });
         }
+    }
+
+    @EventHandler
+    public void onPlayerItemHeld(PlayerItemHeldEvent event) {
+        Player player = event.getPlayer();
+        org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
+            plugin.getBackpackDisplayManager().updateDisplay(player);
+        });
+    }
+
+    @EventHandler
+    public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
+        Player player = event.getPlayer();
+        org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
+            plugin.getBackpackDisplayManager().updateDisplay(player);
+        });
     }
 }
