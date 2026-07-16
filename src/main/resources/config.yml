@@ -141,8 +141,9 @@ messages:
   loc-added: "&aUbicación registrada como punto de desbloqueo para %skin_name%&a."
   upgrade-success: "&a¡Enhorabuena! Has mejorado tu mochila a &e%rows% filas &apor &6$%cost%&a!"
   no-economy: "&cEl sistema de economía (Vault) no está disponible en este momento."
-  no-block-looking: "&c... &c."
-  no-loc-here: "&cɴᴏ ʜᴀʏ ɴɪɴɢᴜɴᴀ ᴍᴏᴄʜɪʟᴀ ʀᴇɢɪsᴛʀᴀᴅᴀ ᴇɴ ᴇsᴛᴇ ʙʟᴏϙᴜᴇ."
+  no-block-looking: "&cDebes estar mirando un bloque para registrar la ubicación."
+  no-loc-here: "&cNo hay ninguna mochila registrada en este bloque."
+  loc-removed: "&cUbicación de desbloqueo eliminada para %skin_name%."
 
 # Sonidades de la interfaz al comprar/interactuar
 sounds:
