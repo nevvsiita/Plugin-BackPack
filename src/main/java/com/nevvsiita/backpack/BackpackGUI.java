@@ -14,6 +14,8 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,25 +58,68 @@ public class BackpackGUI {
     }
 
     /**
-     * Abre el inventario de la mochila en la Página 1 por defecto.
+     * Serializar ItemStack[] a Base64
      */
-    public void openGUI(Player player) {
+    public static String itemStackArrayToBase64(ItemStack[] items) {
+        try {
+            java.io.ByteArrayOutputStream outputStream = new java.io.ByteArrayOutputStream();
+            org.bukkit.util.io.BukkitObjectOutputStream dataOutput = new org.bukkit.util.io.BukkitObjectOutputStream(outputStream);
+            dataOutput.writeInt(items.length);
+            for (int i = 0; i < items.length; i++) {
+                dataOutput.writeObject(items[i]);
+            }
+            dataOutput.close();
+            return java.util.Base64.getEncoder().encodeToString(outputStream.toByteArray());
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /**
+     * Deserializar ItemStack[] desde Base64
+     */
+    public static ItemStack[] itemStackArrayFromBase64(String data) {
+        try {
+            java.io.ByteArrayInputStream inputStream = new java.io.ByteArrayInputStream(java.util.Base64.getDecoder().decode(data));
+            org.bukkit.util.io.BukkitObjectInputStream dataInput = new org.bukkit.util.io.BukkitObjectInputStream(inputStream);
+            ItemStack[] items = new ItemStack[dataInput.readInt()];
+            for (int i = 0; i < items.length; i++) {
+                items[i] = (ItemStack) dataInput.readObject();
+            }
+            dataInput.close();
+            return items;
+        } catch (Exception e) {
+            return new ItemStack[0];
+        }
+    }
+
+    /**
+     * Abre el inventario de la mochila desde un item físico específico.
+     */
+    public void openGUI(Player player, ItemStack backpackItem, int slot) {
         UUID uuid = player.getUniqueId();
-        BackpackManager.BackpackData data = plugin.getBackpackManager().getBackpack(uuid);
         FileConfiguration config = plugin.getConfig();
         int size = 36; // Forzar tamaño de 4 filas
 
         String title = config.getString("gui.title", "<gradient:#a18cd1:#fa97c4>&lᴍᴏᴄʜɪʟᴀ</gradient>");
         title = translateColors(title);
 
-        BackpackHolder holder = new BackpackHolder(uuid, 1);
+        BackpackHolder holder = new BackpackHolder(uuid, 1, backpackItem, slot);
         Inventory inventory = Bukkit.createInventory(holder, size, title);
 
-        // Copiar los contenidos guardados del jugador en la pagina 1 a los primeros 27 slots (0-26)
-        for (int i = 0; i < 27; i++) {
-            ItemStack item = data.getItem(1, i);
-            if (item != null) {
-                inventory.setItem(i, item.clone());
+        // Cargar los items de la mochila desde el NBT del item físico
+        ItemMeta meta = backpackItem.getItemMeta();
+        if (meta != null) {
+            PersistentDataContainer pdc = meta.getPersistentDataContainer();
+            NamespacedKey contentsKey = new NamespacedKey(plugin, "backpack_contents");
+            if (pdc.has(contentsKey, PersistentDataType.STRING)) {
+                String base64 = pdc.get(contentsKey, PersistentDataType.STRING);
+                ItemStack[] items = itemStackArrayFromBase64(base64);
+                for (int i = 0; i < 27; i++) {
+                    if (i < items.length && items[i] != null) {
+                        inventory.setItem(i, items[i].clone());
+                    }
+                }
             }
         }
 
@@ -96,21 +141,31 @@ public class BackpackGUI {
     }
 
     /**
-     * Abre el inventario de la mochila (por compatibilidad hacia atrás).
+     * Abre el inventario de la mochila en la mano principal (por compatibilidad hacia atrás).
+     */
+    public void openGUI(Player player) {
+        ItemStack held = player.getInventory().getItemInMainHand();
+        if (held != null && held.getType() != Material.AIR) {
+            openGUI(player, held, player.getInventory().getHeldItemSlot());
+        }
+    }
+
+    /**
+     * Abre la mochila por número de página (por compatibilidad hacia atrás).
      */
     public void openGUI(Player player, int page) {
         openGUI(player);
     }
 
     /**
-     * Abre el menú selector de colores (skins) para el jugador de forma totalmente simétrica (18 slots).
+     * Abre el menú selector de colores (skins) para el jugador, vinculado a la mochila en uso.
      */
-    public void openSkinSelector(Player player) {
+    public void openSkinSelector(Player player, ItemStack backpackItem, int slot) {
         UUID uuid = player.getUniqueId();
         BackpackManager.BackpackData data = plugin.getBackpackManager().getBackpack(uuid);
         FileConfiguration config = plugin.getConfig();
 
-        SkinSelectorHolder holder = new SkinSelectorHolder();
+        SkinSelectorHolder holder = new SkinSelectorHolder(backpackItem, slot);
         String selectorTitle = config.getString("skin-selector-gui.title", "&8&lsᴇʟᴇᴄᴛᴏʀ ᴅᴇ ᴀsᴘᴇᴄᴛᴏ");
         Inventory selector = Bukkit.createInventory(holder, 18, translateColors(selectorTitle));
 
@@ -119,9 +174,7 @@ public class BackpackGUI {
             selector.setItem(i, createSeparatorItem());
         }
 
-        // Mapeo simétrico para las 12 skins en un inventario de 18 slots:
-        // Fila 1: slots 1, 2, 3, 4, 5, 6, 7 (7 skins centradas, 0 y 8 son bordes)
-        // Fila 2: slots 11, 12, 13, 14, 15 (5 skins centradas, 9, 10, 16 son bordes, 17 es Volver)
+        // Mapeo simétrico para las 12 skins en un inventario de 18 slots
         int[] skinSlots = {1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 15};
 
         ConfigurationSection skinsSection = config.getConfigurationSection("backpack-skins");
@@ -139,25 +192,30 @@ public class BackpackGUI {
                     head = plugin.getHdbHook().getHead(hdbId);
                 }
                 if (head == null) {
-                    head = new ItemStack(Material.CHEST);
+                    head = new ItemStack(Material.PLAYER_HEAD);
                 }
 
                 ItemMeta meta = head.getItemMeta();
                 if (meta != null) {
                     meta.setDisplayName(translateColors(displayName));
+
                     List<String> lore = new ArrayList<>();
-                    
-                    if (data.getActiveSkin().equalsIgnoreCase(key)) {
-                        // Skin equipada actualmente
-                        List<String> activeLore = config.getStringList("skin-selector-gui.status.equipped.lore");
-                        if (activeLore.isEmpty()) {
-                            lore.add(translateColors("&8&m---------------------------------"));
-                            lore.add(translateColors(" &a¡ᴇQᴜɪᴘᴀᴅᴏ ᴀᴄᴛᴜᴀʟᴍᴇɴᴛᴇ!"));
-                            lore.add(translateColors("&8&m---------------------------------"));
-                        } else {
-                            for (String line : activeLore) {
-                                lore.add(translateColors(line));
-                            }
+                    // Obtener aspecto actual del item
+                    String currentSkin = "gray";
+                    ItemMeta bpMeta = backpackItem.getItemMeta();
+                    if (bpMeta != null) {
+                        PersistentDataContainer pdc = bpMeta.getPersistentDataContainer();
+                        NamespacedKey skinKeyTag = new NamespacedKey(plugin, "backpack_skin");
+                        if (pdc.has(skinKeyTag, PersistentDataType.STRING)) {
+                            currentSkin = pdc.get(skinKeyTag, PersistentDataType.STRING);
+                        }
+                    }
+
+                    if (currentSkin.equalsIgnoreCase(key)) {
+                        // Aspecto equipado actualmente
+                        List<String> eqLore = config.getStringList("skin-selector-gui.status.equipped.lore");
+                        for (String line : eqLore) {
+                            lore.add(translateColors(line));
                         }
                         Enchantment unbreaking = Registry.ENCHANTMENT.get(NamespacedKey.minecraft("unbreaking"));
                         if (unbreaking != null) {
@@ -166,65 +224,37 @@ public class BackpackGUI {
                         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                     } else if (data.hasSkinUnlocked(key)) {
                         // Skin desbloqueada pero no equipada
-                        List<String> unlockedLore = config.getStringList("skin-selector-gui.status.unlocked.lore");
-                        if (unlockedLore.isEmpty()) {
-                            lore.add(translateColors("&8&m---------------------------------"));
-                            lore.add(translateColors(" &eᴅᴇsʙʟᴏQᴜᴇᴀᴅᴏ"));
-                            lore.add(translateColors(""));
-                            lore.add(translateColors(" &a&l→ ᴄʟɪᴄᴋ ᴘᴀʀᴀ ᴇQᴜɪᴘᴀʀ"));
-                            lore.add(translateColors("&8&m---------------------------------"));
-                        } else {
-                            for (String line : unlockedLore) {
-                                lore.add(translateColors(line));
-                            }
+                        List<String> unLore = config.getStringList("skin-selector-gui.status.unlocked.lore");
+                        for (String line : unLore) {
+                            lore.add(translateColors(line));
                         }
                     } else {
                         // Skin bloqueada
-                        List<String> lockedLore = config.getStringList("skin-selector-gui.status.locked.lore");
-                        if (lockedLore.isEmpty()) {
-                            lore.add(translateColors("&8&m---------------------------------"));
-                            lore.add(translateColors(" &cʙʟᴏQᴜᴇᴀᴅᴏ"));
-                            lore.add(translateColors(" &7ᴅᴇʙᴇs ᴇɴᴄᴏɴᴛʀᴀʀ ᴇsᴛᴇ ᴀsᴘᴇᴄᴛᴏ"));
-                            lore.add(translateColors(" &7ᴇsᴄᴏɴᴅɪᴅᴏ ᴇɴ ᴇʟ ᴍᴀᴘᴀ ᴅᴇʟ sᴇʀᴠɪᴅᴏʀ."));
-                            lore.add(translateColors("&8&m---------------------------------"));
-                        } else {
-                            for (String line : lockedLore) {
-                                lore.add(translateColors(line));
-                            }
+                        List<String> lockLore = config.getStringList("skin-selector-gui.status.locked.lore");
+                        for (String line : lockLore) {
+                            lore.add(translateColors(line));
                         }
                     }
                     meta.setLore(lore);
                     head.setItemMeta(meta);
                 }
+
                 selector.setItem(guiSlot, head);
                 index++;
             }
         }
 
-        // Botón de Volver en el slot 17 (última esquina derecha de la fila 2)
-        String backMaterial = config.getString("skin-selector-gui.back-button.material", "BARRIER");
-        Material backMat = Material.matchMaterial(backMaterial);
-        if (backMat == null) backMat = Material.BARRIER;
-        ItemStack backButton = new ItemStack(backMat);
+        // Botón volver
+        ItemStack backButton = new ItemStack(Material.valueOf(config.getString("skin-selector-gui.back-button.material", "BARRIER")));
         ItemMeta backMeta = backButton.getItemMeta();
         if (backMeta != null) {
-            String backName = config.getString("skin-selector-gui.back-button.name", "&c&lVOLVER");
-            backMeta.setDisplayName(translateColors(backName));
+            backMeta.setDisplayName(translateColors(config.getString("skin-selector-gui.back-button.name", "&c&lᴠᴏʟᴠᴇʀ")));
             List<String> backLore = config.getStringList("skin-selector-gui.back-button.lore");
-            if (backLore.isEmpty()) {
-                backLore = new ArrayList<>();
-                backLore.add(translateColors("&8&m---------------------------------"));
-                backLore.add(translateColors(" &7ʜᴀᴢ ᴄʟɪᴄ ᴘᴀʀᴀ ʀᴇɢʀᴇsᴀʀ ᴀ ʟᴀ"));
-                backLore.add(translateColors(" &7ᴍᴏᴄʜɪʟᴀ ᴘʀɪɴᴄɪᴘᴀʟ."));
-                backLore.add(translateColors("&8&m---------------------------------"));
-            } else {
-                List<String> temp = new ArrayList<>();
-                for (String line : backLore) {
-                    temp.add(translateColors(line));
-                }
-                backLore = temp;
+            List<String> coloredBackLore = new ArrayList<>();
+            for (String line : backLore) {
+                coloredBackLore.add(translateColors(line));
             }
-            backMeta.setLore(backLore);
+            backMeta.setLore(coloredBackLore);
             backButton.setItemMeta(backMeta);
         }
         selector.setItem(17, backButton);
@@ -511,15 +541,19 @@ public class BackpackGUI {
     }
 
     /**
-     * Custom InventoryHolder para identificar el GUI principal con soporte de página.
+     * Custom InventoryHolder para identificar el GUI principal con soporte de página y enlace a ítem físico.
      */
     public static class BackpackHolder implements InventoryHolder {
         private final UUID ownerUUID;
         private final int page;
+        private final ItemStack backpackItem;
+        private final int slot;
 
-        public BackpackHolder(UUID ownerUUID, int page) {
+        public BackpackHolder(UUID ownerUUID, int page, ItemStack backpackItem, int slot) {
             this.ownerUUID = ownerUUID;
             this.page = page;
+            this.backpackItem = backpackItem;
+            this.slot = slot;
         }
 
         @Override
@@ -534,15 +568,39 @@ public class BackpackGUI {
         public int getPage() {
             return page;
         }
+
+        public ItemStack getBackpackItem() {
+            return backpackItem;
+        }
+
+        public int getSlot() {
+            return slot;
+        }
     }
 
     /**
      * Custom InventoryHolder para el selector de aspectos.
      */
     public static class SkinSelectorHolder implements InventoryHolder {
+        private final ItemStack backpackItem;
+        private final int slot;
+
+        public SkinSelectorHolder(ItemStack backpackItem, int slot) {
+            this.backpackItem = backpackItem;
+            this.slot = slot;
+        }
+
         @Override
         public Inventory getInventory() {
             return null;
+        }
+
+        public ItemStack getBackpackItem() {
+            return backpackItem;
+        }
+
+        public int getSlot() {
+            return slot;
         }
     }
 }

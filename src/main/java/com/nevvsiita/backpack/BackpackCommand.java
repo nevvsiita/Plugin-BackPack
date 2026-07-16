@@ -35,7 +35,7 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         String prefix = getMsg("messages.prefix");
 
-        // Si no hay argumentos, abre la mochila del remitente
+        // Si no hay argumentos, abre la mochila en la mano del remitente
         if (args.length == 0) {
             if (!(sender instanceof Player)) {
                 sender.sendMessage(prefix + getMsg("messages.only-players"));
@@ -46,7 +46,12 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                 player.sendMessage(prefix + getMsg("messages.no-permission"));
                 return true;
             }
-            plugin.getBackpackGUI().openGUI(player);
+            ItemStack held = player.getInventory().getItemInMainHand();
+            if (held != null && held.getType() != Material.AIR && isBackpackItem(held)) {
+                plugin.getBackpackGUI().openGUI(player, held, player.getInventory().getHeldItemSlot());
+            } else {
+                player.sendMessage(prefix + BackpackGUI.translateColors("&cDebes tener una mochila en tu mano principal para abrirla."));
+            }
             return true;
         }
 
@@ -210,7 +215,7 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                     // Refrescar GUI si tiene la mochila abierta en su página actual
                     if (target.getOpenInventory() != null && target.getOpenInventory().getTopInventory().getHolder() instanceof BackpackGUI.BackpackHolder) {
                         BackpackGUI.BackpackHolder h = (BackpackGUI.BackpackHolder) target.getOpenInventory().getTopInventory().getHolder();
-                        plugin.getBackpackGUI().openGUI(target, h.getPage());
+                        plugin.getBackpackGUI().openGUI(target, h.getBackpackItem(), h.getSlot());
                     }
 
                     String msg = getMsg("messages.admin-set-success")

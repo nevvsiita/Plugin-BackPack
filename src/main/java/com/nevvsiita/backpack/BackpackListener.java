@@ -49,7 +49,7 @@ public class BackpackListener implements Listener {
                 Player player = event.getPlayer();
                 
                 if (player.hasPermission("backpack.use")) {
-                    plugin.getBackpackGUI().openGUI(player);
+                    plugin.getBackpackGUI().openGUI(player, item, player.getInventory().getHeldItemSlot());
                 } else {
                     player.sendMessage(translateColors(plugin.getConfig().getString("messages.prefix") + 
                             plugin.getConfig().getString("messages.no-permission")));
@@ -83,7 +83,16 @@ public class BackpackListener implements Listener {
 
         // --- INTERFAZ PRINCIPAL DE LA MOCHILA ---
         if (inventory.getHolder() instanceof BackpackGUI.BackpackHolder) {
+            BackpackGUI.BackpackHolder holder = (BackpackGUI.BackpackHolder) inventory.getHolder();
             int slot = event.getSlot();
+
+            // Bloquear que interactúen con la propia mochila que está abierta en su inventario
+            if (clickedInventory.getType() == org.bukkit.event.inventory.InventoryType.PLAYER) {
+                if (event.getSlot() == holder.getSlot() || isBackpackItem(event.getCurrentItem())) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
 
             // 1. Click en la parte superior (la mochila)
             if (clickedInventory.getHolder() instanceof BackpackGUI.BackpackHolder) {
@@ -117,7 +126,7 @@ public class BackpackListener implements Listener {
                     event.setCancelled(true);
                     if (slot == 31) {
                         // Abrir el selector de skins
-                        plugin.getBackpackGUI().openSkinSelector(player);
+                        plugin.getBackpackGUI().openSkinSelector(player, holder.getBackpackItem(), holder.getSlot());
                     }
                 }
             } else {
@@ -158,10 +167,11 @@ public class BackpackListener implements Listener {
                 return;
             }
 
+            BackpackGUI.SkinSelectorHolder sh = (BackpackGUI.SkinSelectorHolder) inventory.getHolder();
             int slot = event.getSlot();
             if (slot == 17) {
                 // Botón volver a la mochila principal
-                plugin.getBackpackGUI().openGUI(player);
+                plugin.getBackpackGUI().openGUI(player, sh.getBackpackItem(), sh.getSlot());
                 return;
             }
 
@@ -184,22 +194,58 @@ public class BackpackListener implements Listener {
                         UUID uuid = player.getUniqueId();
                         BackpackManager.BackpackData data = plugin.getBackpackManager().getBackpack(uuid);
 
-                        if (data.getActiveSkin().equalsIgnoreCase(skinKey)) {
+                        // Obtener aspecto actual del item
+                        String currentSkin = "gray";
+                        ItemStack backpackItem = sh.getBackpackItem();
+                        ItemMeta bpMeta = backpackItem.getItemMeta();
+                        if (bpMeta != null) {
+                            PersistentDataContainer pdc = bpMeta.getPersistentDataContainer();
+                            NamespacedKey skinKeyTag = new NamespacedKey(plugin, "backpack_skin");
+                            if (pdc.has(skinKeyTag, PersistentDataType.STRING)) {
+                                currentSkin = pdc.get(skinKeyTag, PersistentDataType.STRING);
+                            }
+                        }
+
+                        if (currentSkin.equalsIgnoreCase(skinKey)) {
                             return; // Ya equipada
                         }
 
                         if (data.hasSkinUnlocked(skinKey)) {
-                            data.setActiveSkin(skinKey);
-                            plugin.getBackpackManager().saveBackpack(uuid);
-                            
-                            playConfigSound(player, "sounds.equip-skin", "ITEM_ARMOR_EQUIP_LEATHER");
-                            
+                            // Cambiar textura de la cabeza y el nombre del item físico
                             String displayName = skinsSection.getString(skinKey + ".name", skinKey);
+                            String hdbId = skinsSection.getString(skinKey + ".hdb-id");
+                            
+                            ItemMeta itemMeta = backpackItem.getItemMeta();
+                            if (itemMeta != null) {
+                                ItemStack newHead = plugin.getHdbHook().getHead(hdbId);
+                                if (newHead != null && newHead.hasItemMeta()) {
+                                    if (itemMeta instanceof org.bukkit.inventory.meta.SkullMeta && newHead.getItemMeta() instanceof org.bukkit.inventory.meta.SkullMeta) {
+                                        try {
+                                            java.lang.reflect.Field profileField = itemMeta.getClass().getDeclaredField("profile");
+                                            profileField.setAccessible(true);
+                                            java.lang.reflect.Field newProfileField = newHead.getItemMeta().getClass().getDeclaredField("profile");
+                                            newProfileField.setAccessible(true);
+                                            profileField.set(itemMeta, newProfileField.get(newHead.getItemMeta()));
+                                        } catch (Exception e) {
+                                            // Fallback
+                                        }
+                                    }
+                                }
+                                
+                                String finalName = plugin.getConfig().getString("backpack-item.name", "%skin_name% &7(ᴄʟɪᴄᴋ ᴅᴇʀᴇᴄʜᴏ ᴘᴀʀᴀ ᴀʙʀɪʀ)")
+                                        .replace("%skin_name%", displayName);
+                                itemMeta.setDisplayName(translateColors(finalName));
+                                
+                                NamespacedKey skinKeyTag = new NamespacedKey(plugin, "backpack_skin");
+                                itemMeta.getPersistentDataContainer().set(skinKeyTag, PersistentDataType.STRING, skinKey);
+                                backpackItem.setItemMeta(itemMeta);
+                            }
+
+                            playConfigSound(player, "sounds.equip-skin", "ITEM_ARMOR_EQUIP_LEATHER");
                             player.sendMessage(translateColors(plugin.getConfig().getString("messages.prefix") + 
                                     plugin.getConfig().getString("messages.skin-equipped").replace("%skin_name%", displayName)));
                             
-                            updatePhysicalBackpackInInventory(player, skinKey);
-                            plugin.getBackpackGUI().openSkinSelector(player);
+                            plugin.getBackpackGUI().openSkinSelector(player, backpackItem, sh.getSlot());
                         } else {
                             playConfigSound(player, "sounds.unlock-fail", "ENTITY_VILLAGER_NO");
                             player.sendMessage(translateColors(plugin.getConfig().getString("messages.prefix") + 
@@ -286,19 +332,30 @@ public class BackpackListener implements Listener {
         }
 
         Player player = (Player) event.getPlayer();
-        BackpackManager.BackpackData data = plugin.getBackpackManager().getBackpack(player.getUniqueId());
+        BackpackGUI.BackpackHolder holder = (BackpackGUI.BackpackHolder) inventory.getHolder();
+        ItemStack backpackItem = holder.getBackpackItem();
 
-        // Guardar ítems de los slots 0-26 en los datos del jugador (pagina 1)
-        data.clearPage(1);
+        // 1. Guardar ítems de los slots 0-26 de la GUI
+        ItemStack[] contents = new ItemStack[27];
         for (int i = 0; i < 27; i++) {
             ItemStack item = inventory.getItem(i);
-            if (item != null && item.getType() != org.bukkit.Material.AIR) {
-                data.setItem(1, i, item.clone());
-            }
+            contents[i] = (item != null && item.getType() != org.bukkit.Material.AIR) ? item.clone() : null;
         }
 
-        // Guardar físicamente en disco
-        plugin.getBackpackManager().saveBackpack(player.getUniqueId());
+        // 2. Serializar y guardar en el NBT del item físico
+        try {
+            String base64 = BackpackGUI.itemStackArrayToBase64(contents);
+            ItemMeta meta = backpackItem.getItemMeta();
+            if (meta != null) {
+                PersistentDataContainer pdc = meta.getPersistentDataContainer();
+                NamespacedKey contentsKey = new NamespacedKey(plugin, "backpack_contents");
+                pdc.set(contentsKey, PersistentDataType.STRING, base64);
+                backpackItem.setItemMeta(meta);
+            }
+        } catch (Exception e) {
+            player.sendMessage(translateColors("&c¡Error fatal guardando los contenidos de la mochila!"));
+            plugin.getLogger().severe("No se pudo guardar la mochila: " + e.getMessage());
+        }
 
         // Sonido de cierre
         String soundName = plugin.getConfig().getString("sounds.close-backpack", "BLOCK_CHEST_CLOSE");
