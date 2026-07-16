@@ -190,6 +190,18 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                 return true;
             } 
             
+            if (action.equalsIgnoreCase("inspect")) {
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(prefix + getMsg("messages.only-players"));
+                    return true;
+                }
+
+                Player admin = (Player) sender;
+                plugin.getBackpackGUI().openGUIForAdmin(admin, targetUUID);
+                sender.sendMessage(prefix + BackpackGUI.translateColors("&aAbriendo la mochila de &e" + target.getName() + "&a."));
+                return true;
+            }
+
             if (action.equalsIgnoreCase("setslots")) {
                 if (args.length < 4) {
                     sender.sendMessage(prefix + getMsg("messages.admin-usage"));
@@ -243,14 +255,14 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                 return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase())).collect(Collectors.toList());
             }
             if (args[0].equalsIgnoreCase("admin") && sender.hasPermission("backpack.admin")) {
-                return Arrays.asList("setslots", "getslots", "addloc", "removeloc", "reload").stream().filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase())).collect(Collectors.toList());
+                return Arrays.asList("setslots", "getslots", "inspect", "addloc", "removeloc", "reload").stream().filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase())).collect(Collectors.toList());
             }
         }
 
         if (args.length == 3) {
             if (args[0].equalsIgnoreCase("admin") && sender.hasPermission("backpack.admin")) {
                 String action = args[1];
-                if (action.equalsIgnoreCase("setslots") || action.equalsIgnoreCase("getslots")) {
+                if (action.equalsIgnoreCase("setslots") || action.equalsIgnoreCase("getslots") || action.equalsIgnoreCase("inspect")) {
                     return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().startsWith(args[2].toLowerCase())).collect(Collectors.toList());
                 }
                 if (action.equalsIgnoreCase("addloc")) {

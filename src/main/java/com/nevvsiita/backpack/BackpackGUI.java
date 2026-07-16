@@ -251,6 +251,52 @@ public class BackpackGUI {
     }
 
     /**
+     * Abre el inventario de la mochila de un jugador objetivo para inspección administrativa.
+     */
+    public void openGUIForAdmin(Player admin, UUID ownerUUID) {
+        BackpackManager.BackpackData data = plugin.getBackpackManager().getBackpack(ownerUUID);
+        FileConfiguration config = plugin.getConfig();
+
+        int unlockedRows = data.getUnlockedSlots(); // 1 a 5
+        if (unlockedRows < 1) unlockedRows = 1;
+        if (unlockedRows > 5) unlockedRows = 5;
+
+        int size = (unlockedRows + 1) * 9;
+
+        // Título especial de inspección para administradores
+        String title = translateColors("&4&lInspeccionando: &c" + Bukkit.getOfflinePlayer(ownerUUID).getName());
+
+        // El holder tiene ownerUUID para que al cerrar se guarde en sus datos, pero backpackItem es null
+        BackpackHolder holder = new BackpackHolder(ownerUUID, 1, null, -1);
+        Inventory inventory = Bukkit.createInventory(holder, size, title);
+
+        int storageSlots = unlockedRows * 9;
+
+        // Cargar los items de la mochila desde los datos del jugador (página 1)
+        for (int i = 0; i < storageSlots; i++) {
+            ItemStack item = data.getItem(1, i);
+            if (item != null) {
+                inventory.setItem(i, item.clone());
+            }
+        }
+
+        // Llenar la última fila con botones especiales
+        int controlStart = storageSlots;
+        for (int i = controlStart; i < size; i++) {
+            int relative = i - controlStart;
+            if (relative == 4) {
+                inventory.setItem(i, createColorButton());
+            } else if (relative == 6) {
+                inventory.setItem(i, createUpgradeButton(unlockedRows));
+            } else {
+                inventory.setItem(i, createSeparatorItem());
+            }
+        }
+
+        admin.openInventory(inventory);
+    }
+
+    /**
      * Abre el menú selector de colores (skins) para el jugador, vinculado a la mochila en uso.
      */
     public void openSkinSelector(Player player, ItemStack backpackItem, int slot) {
@@ -295,14 +341,19 @@ public class BackpackGUI {
                     List<String> lore = new ArrayList<>();
                     // Obtener aspecto actual del item
                     String currentSkin = "gray";
-                    ItemMeta bpMeta = backpackItem.getItemMeta();
-                    if (bpMeta != null) {
-                        PersistentDataContainer pdc = bpMeta.getPersistentDataContainer();
-                        NamespacedKey skinKeyTag = new NamespacedKey(plugin, "backpack_skin");
-                        if (pdc.has(skinKeyTag, PersistentDataType.STRING)) {
-                            currentSkin = pdc.get(skinKeyTag, PersistentDataType.STRING);
+                    if (backpackItem != null) {
+                        ItemMeta bpMeta = backpackItem.getItemMeta();
+                        if (bpMeta != null) {
+                            PersistentDataContainer pdc = bpMeta.getPersistentDataContainer();
+                            NamespacedKey skinKeyTag = new NamespacedKey(plugin, "backpack_skin");
+                            if (pdc.has(skinKeyTag, PersistentDataType.STRING)) {
+                                currentSkin = pdc.get(skinKeyTag, PersistentDataType.STRING);
+                            }
                         }
+                    } else {
+                        currentSkin = data.getActiveSkin();
                     }
+
 
                     if (currentSkin.equalsIgnoreCase(key)) {
                         // Aspecto equipado actualmente
