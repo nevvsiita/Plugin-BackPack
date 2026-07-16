@@ -40,21 +40,18 @@ public class BackpackListener implements Listener {
      */
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getHand() != EquipmentSlot.HAND) {
-            return;
-        }
-
         if (event.getAction().name().contains("RIGHT_CLICK")) {
             ItemStack item = event.getItem();
             if (item != null && isBackpackItem(item)) {
                 event.setCancelled(true);
-                Player player = event.getPlayer();
-                
-                if (player.hasPermission("backpack.use")) {
-                    plugin.getBackpackGUI().openGUI(player, item, player.getInventory().getHeldItemSlot());
-                } else {
-                    player.sendMessage(translateColors(plugin.getConfig().getString("messages.prefix") + 
-                            plugin.getConfig().getString("messages.no-permission")));
+                if (event.getHand() == EquipmentSlot.HAND) {
+                    Player player = event.getPlayer();
+                    if (player.hasPermission("backpack.use")) {
+                        plugin.getBackpackGUI().openGUI(player, item, player.getInventory().getHeldItemSlot());
+                    } else {
+                        player.sendMessage(translateColors(plugin.getConfig().getString("messages.prefix") + 
+                                plugin.getConfig().getString("messages.no-permission")));
+                    }
                 }
             }
         }
@@ -81,6 +78,32 @@ public class BackpackListener implements Listener {
         Inventory clickedInventory = event.getClickedInventory();
         if (clickedInventory == null) {
             return;
+        }
+
+        // --- EVITAR EQUIPAR LA MOCHILA EN LA CABEZA ---
+        if (event.getSlotType() == org.bukkit.event.inventory.InventoryType.SlotType.ARMOR && event.getRawSlot() == 5) {
+            if (isBackpackItem(event.getCursor()) || isBackpackItem(event.getCurrentItem())) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+        if (event.isShiftClick() && isBackpackItem(event.getCurrentItem())) {
+            if (event.getView().getTopInventory().getType() == org.bukkit.event.inventory.InventoryType.CRAFTING) {
+                if (player.getInventory().getHelmet() == null) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+        if (event.getSlotType() == org.bukkit.event.inventory.InventoryType.SlotType.ARMOR && event.getRawSlot() == 5 && event.getClick().name().contains("NUMBER_KEY")) {
+            int button = event.getHotbarButton();
+            if (button >= 0 && button < 9) {
+                ItemStack hotbarItem = player.getInventory().getItem(button);
+                if (isBackpackItem(hotbarItem)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
         }
 
         // --- INTERFAZ PRINCIPAL DE LA MOCHILA ---
@@ -329,6 +352,12 @@ public class BackpackListener implements Listener {
      */
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
+        // Evita que el jugador arrastre la mochila física hacia el slot de casco.
+        if (isBackpackItem(event.getOldCursor()) && event.getRawSlots().contains(5)) {
+            event.setCancelled(true);
+            return;
+        }
+
         Inventory inventory = event.getInventory();
         if (inventory.getHolder() instanceof BackpackGUI.BackpackHolder) {
             int size = inventory.getSize();
