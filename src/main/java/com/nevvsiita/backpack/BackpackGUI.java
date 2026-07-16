@@ -144,14 +144,15 @@ public class BackpackGUI {
 
         ItemMeta meta = head.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(translateColors(config.getString("upgrade-button.name", "&6&lᴍᴇᴊᴏʀᴀʀ ᴇsᴘᴀᴄɪᴏ")));
             List<String> lore = new ArrayList<>();
             if (currentRows >= 5) {
+                meta.setDisplayName(translateColors(config.getString("upgrade-button.name-maxed", "&a&lᴄᴀᴘᴀᴄɪᴅᴀᴅ ʏᴀ ᴍᴇᴊᴏʀᴀᴅᴀ")));
                 List<String> maxLore = config.getStringList("upgrade-button.lore-maxed");
                 for (String line : maxLore) {
                     lore.add(translateColors(line));
                 }
             } else {
+                meta.setDisplayName(translateColors(config.getString("upgrade-button.name", "&6&lᴍᴇᴊᴏʀᴀʀ ᴇsᴘᴀᴄɪᴏ")));
                 int nextRows = currentRows + 1;
                 int currentSlots = currentRows * 9;
                 int nextSlots = nextRows * 9;

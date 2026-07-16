@@ -65,6 +65,7 @@ upgrade-button:
   material: "PLAYER_HEAD"
   hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTM3ZGNmYjY2YTYxYzUyOWYyYTEyOGFlZWY5M2MyNWY5ZDBiMDQzOWI1OWZiMTk5ZDJiMDRhY2ZlMGI4NWFhYyJ9fX0="
   name: "<gradient:#FFE0AF:#FFD08F>&lᴍᴇᴊᴏʀᴀʀ ᴄᴀᴘᴀᴄɪᴅᴀᴅ</gradient>"
+  name-maxed: "<gradient:#A2FFB6:#84FF9C>&lᴄᴀᴘᴀᴄɪᴅᴀᴅ ʏᴀ ᴍᴇᴊᴏʀᴀᴅᴀ</gradient>"
   cost-row-2: 400000
   cost-row-3: 800000
   cost-row-4: 1200000
