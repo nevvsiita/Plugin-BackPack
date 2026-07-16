@@ -15,6 +15,36 @@ cooldowns:
   # Tiempo de espera para cambiar de color/aspecto de mochila
   change-skin: 10
 
+# Ajustes de renderizado de la mochila en la espalda del jugador
+backpack-display:
+  # Habilitar o deshabilitar mostrar la mochila en la espalda
+  enabled: true
+  # Modo de transformación de Minecraft (HEAD, FIXED, NONE, GROUND, etc.)
+  # HEAD: Sigue la orientación de la cabeza (puede rotar y girar al mirar arriba/abajo).
+  # FIXED: Fijo respecto al cuerpo del jugador (¡RECOMENDADO para evitar que gire raro al caminar!).
+  transform: "FIXED"
+  # Ajustes de posición de la mochila (desplazamientos relativos al jugador)
+  position:
+    # Desplazamiento lateral (0 = centrado)
+    x: 0.0
+    # Altura (-0.80 = a la altura de la espalda)
+    y: -0.80
+    # Distancia hacia atrás (-0.22 = pegada a la espalda)
+    z: -0.22
+  # Ajustes de rotación (en grados)
+  rotation:
+    # Rotación en el eje Y (180.0 = para que la cara frontal de la mochila mire hacia atrás)
+    y: 180.0
+    # Rotación en el eje X
+    x: 0.0
+    # Rotación en el eje Z
+    z: 0.0
+  # Ajustes de escala (tamaño de la mochila en la espalda)
+  scale:
+    x: 0.65
+    y: 0.65
+    z: 0.65
+
 # Ajustes de la interfaz del selector de aspectos (skins)
 skin-selector-gui:
   # Título del inventario del selector (Gris oscuro y en tipografía Small Caps)

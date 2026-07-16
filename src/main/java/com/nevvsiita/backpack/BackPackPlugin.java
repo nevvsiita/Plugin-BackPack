@@ -11,6 +11,7 @@ public class BackPackPlugin extends JavaPlugin {
     private BackpackGUI backpackGUI;
     private BackpackCommand backpackCommand;
     private LocationsManager locationsManager;
+    private BackpackDisplayManager backpackDisplayManager;
 
     @Override
     public void onEnable() {
@@ -35,6 +36,8 @@ public class BackPackPlugin extends JavaPlugin {
         this.backpackGUI = new BackpackGUI(this);
         this.backpackCommand = new BackpackCommand(this);
         this.locationsManager = new LocationsManager(this);
+        this.backpackDisplayManager = new BackpackDisplayManager(this);
+        this.backpackDisplayManager.startTask();
 
         // Registrar eventos
         getServer().getPluginManager().registerEvents(new BackpackListener(this), this);
@@ -91,6 +94,9 @@ public class BackPackPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (backpackDisplayManager != null) {
+            backpackDisplayManager.cleanAll();
+        }
         // Guardar todos los datos activos de las mochilas en disco antes de apagar/recargar el servidor
         if (backpackManager != null) {
             backpackManager.saveAll();
@@ -125,5 +131,9 @@ public class BackPackPlugin extends JavaPlugin {
 
     public LocationsManager getLocationsManager() {
         return locationsManager;
+    }
+
+    public BackpackDisplayManager getBackpackDisplayManager() {
+        return backpackDisplayManager;
     }
 }
