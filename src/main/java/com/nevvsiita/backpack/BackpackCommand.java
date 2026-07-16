@@ -238,6 +238,68 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
 
+            if (action.equalsIgnoreCase("resetslots")) {
+                data.setUnlockedSlots(1);
+                plugin.getBackpackManager().saveBackpack(targetUUID);
+
+                // Refrescar GUI si tiene la mochila abierta
+                if (target.getOpenInventory() != null && target.getOpenInventory().getTopInventory().getHolder() instanceof BackpackGUI.BackpackHolder) {
+                    BackpackGUI.BackpackHolder h = (BackpackGUI.BackpackHolder) target.getOpenInventory().getTopInventory().getHolder();
+                    plugin.getBackpackGUI().openGUI(target, h.getBackpackItem(), h.getSlot());
+                }
+
+                sender.sendMessage(prefix + BackpackGUI.translateColors("&aHas restablecido las ranuras de &e" + target.getName() + " &aal valor por defecto (Nivel 1)."));
+                return true;
+            }
+
+            if (action.equalsIgnoreCase("resetcolors")) {
+                data.getUnlockedSkins().clear();
+                data.setActiveSkin("gray");
+                plugin.getBackpackManager().saveBackpack(targetUUID);
+
+                // Forzar actualización física del item en la mano del jugador
+                updatePhysicalBackpacks(target, "gray");
+
+                sender.sendMessage(prefix + BackpackGUI.translateColors("&aHas restablecido los colores desbloqueados de &e" + target.getName() + " &aal estado por defecto (Solo Gris)."));
+                return true;
+            }
+
+            if (action.equalsIgnoreCase("addcolor")) {
+                if (args.length < 4) {
+                    sender.sendMessage(prefix + BackpackGUI.translateColors("&cEspecifica el color. Uso: /mochila admin addcolor <player> <color>"));
+                    return true;
+                }
+                String colorKey = args[3];
+                ConfigurationSection skinsSection = plugin.getConfig().getConfigurationSection("backpack-skins");
+                if (skinsSection == null || !skinsSection.contains(colorKey)) {
+                    sender.sendMessage(prefix + BackpackGUI.translateColors("&cColor/aspecto no válido."));
+                    return true;
+                }
+
+                data.unlockSkin(colorKey);
+                plugin.getBackpackManager().saveBackpack(targetUUID);
+
+                sender.sendMessage(prefix + BackpackGUI.translateColors("&aHas desbloqueado el aspecto &e" + colorKey + " &apara &b" + target.getName() + "&a."));
+                return true;
+            }
+
+            if (action.equalsIgnoreCase("removecolor")) {
+                if (args.length < 4) {
+                    sender.sendMessage(prefix + BackpackGUI.translateColors("&cEspecifica el color. Uso: /mochila admin removecolor <player> <color>"));
+                    return true;
+                }
+                String colorKey = args[3];
+                data.getUnlockedSkins().remove(colorKey);
+                if (data.getActiveSkin().equalsIgnoreCase(colorKey)) {
+                    data.setActiveSkin("gray");
+                    updatePhysicalBackpacks(target, "gray");
+                }
+                plugin.getBackpackManager().saveBackpack(targetUUID);
+
+                sender.sendMessage(prefix + BackpackGUI.translateColors("&cHas bloqueado/quitado el aspecto &e" + colorKey + " &cpara &b" + target.getName() + "&c."));
+                return true;
+            }
+
             sender.sendMessage(prefix + getMsg("messages.admin-usage"));
             return true;
         }
@@ -262,20 +324,32 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                 return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase())).collect(Collectors.toList());
             }
             if (args[0].equalsIgnoreCase("admin") && sender.hasPermission("backpack.admin")) {
-                return Arrays.asList("setslots", "getslots", "inspect", "addloc", "removeloc", "reload").stream().filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase())).collect(Collectors.toList());
+                return Arrays.asList("setslots", "getslots", "resetslots", "resetcolors", "addcolor", "removecolor", "inspect", "addloc", "removeloc", "reload").stream().filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase())).collect(Collectors.toList());
             }
         }
 
         if (args.length == 3) {
             if (args[0].equalsIgnoreCase("admin") && sender.hasPermission("backpack.admin")) {
                 String action = args[1];
-                if (action.equalsIgnoreCase("setslots") || action.equalsIgnoreCase("getslots") || action.equalsIgnoreCase("inspect")) {
+                if (action.equalsIgnoreCase("setslots") || action.equalsIgnoreCase("getslots") || action.equalsIgnoreCase("resetslots") || action.equalsIgnoreCase("resetcolors") || action.equalsIgnoreCase("addcolor") || action.equalsIgnoreCase("removecolor") || action.equalsIgnoreCase("inspect")) {
                     return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().startsWith(args[2].toLowerCase())).collect(Collectors.toList());
                 }
                 if (action.equalsIgnoreCase("addloc")) {
                     ConfigurationSection skinsSection = plugin.getConfig().getConfigurationSection("backpack-skins");
                     if (skinsSection != null) {
                         return new ArrayList<>(skinsSection.getKeys(false)).stream().filter(s -> s.toLowerCase().startsWith(args[2].toLowerCase())).collect(Collectors.toList());
+                    }
+                }
+            }
+        }
+
+        if (args.length == 4) {
+            if (args[0].equalsIgnoreCase("admin") && sender.hasPermission("backpack.admin")) {
+                String action = args[1];
+                if (action.equalsIgnoreCase("addcolor") || action.equalsIgnoreCase("removecolor")) {
+                    ConfigurationSection skinsSection = plugin.getConfig().getConfigurationSection("backpack-skins");
+                    if (skinsSection != null) {
+                        return new ArrayList<>(skinsSection.getKeys(false)).stream().filter(s -> s.toLowerCase().startsWith(args[3].toLowerCase())).collect(Collectors.toList());
                     }
                 }
             }

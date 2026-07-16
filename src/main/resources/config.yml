@@ -134,7 +134,7 @@ messages:
   slot-unlocked: "&a¡Has desbloqueado una nueva ranura por &e$%cost%&a!"
   slot-locked-previous: "&c¡Debes desbloquear las ranuras anteriores primero!"
   data-saved: "&aLos datos de tu mochila han sido guardados."
-  admin-usage: "&eUso: &b/mochila admin [setslots/getslots/addloc/removeloc/reload] ... &oó &b/mochila give [jugador]"
+  admin-usage: "&eUso: &b/mochila admin [setslots/getslots/resetslots/resetcolors/addcolor/removecolor/addloc/removeloc/reload] ... &oó &b/mochila give [jugador]"
   player-not-found: "&cJugador no encontrado."
   admin-set-success: "&aHas establecido las ranuras de &e%player% &aa &b%slots%&a."
   admin-get-success: "&aEl jugador &e%player% &atiene &b%slots% &aranuras desbloqueadas."
