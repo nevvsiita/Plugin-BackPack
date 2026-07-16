@@ -7,7 +7,7 @@ commands:
   mochila:
     description: Abre tu mochila progresiva o adminístrala.
     aliases: [backpack]
-    permission: backpack.use
+    permission: backpack.admin
     usage: /mochila [admin/give]
 permissions:
   backpack.use:

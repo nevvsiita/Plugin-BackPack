@@ -35,9 +35,14 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         String prefix = getMsg("messages.prefix");
 
-        // Si no hay argumentos, enviar un mensaje indicando que está desactivado y se debe usar el ítem físico
+        if (!sender.hasPermission("backpack.admin")) {
+            sender.sendMessage(prefix + getMsg("messages.no-permission"));
+            return true;
+        }
+
+        // Si no hay argumentos, mostrar el uso administrativo
         if (args.length == 0) {
-            sender.sendMessage(prefix + BackpackGUI.translateColors("&cEl comando para abrir la mochila está desactivado. Haz clic derecho con el ítem físico de la mochila para abrirla."));
+            sender.sendMessage(prefix + getMsg("messages.admin-usage"));
             return true;
         }
 
