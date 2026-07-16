@@ -98,13 +98,10 @@ public class BackpackListener implements Listener {
 
             // 1. Click en la parte superior (la mochila)
             if (clickedInventory.getHolder() instanceof BackpackGUI.BackpackHolder) {
-                if (slot < 27) {
-                    int unlockedRows = data.getUnlockedSlots();
-                    if (BackpackGUI.isSlotLocked(slot, unlockedRows)) {
-                        event.setCancelled(true);
-                        return;
-                    }
+                int unlockedRows = data.getUnlockedSlots();
+                int storageSlots = unlockedRows * 9;
 
+                if (slot < storageSlots) {
                     // Evitar meter arrastrando con cursor
                     if (isForbiddenItem(event.getCursor())) {
                         event.setCancelled(true);
@@ -132,10 +129,11 @@ public class BackpackListener implements Listener {
                 } else {
                     // Botón de control o separador
                     event.setCancelled(true);
-                    if (slot == 31) {
+                    int relative = slot - storageSlots;
+                    if (relative == 4) {
                         // Abrir el selector de skins
                         plugin.getBackpackGUI().openSkinSelector(player, holder.getBackpackItem(), holder.getSlot());
-                    } else if (slot == 33) {
+                    } else if (relative == 6) {
                         // Comprar mejora de espacio
                         tryUpgradeBackpack(player, data, holder);
                     }
@@ -155,7 +153,9 @@ public class BackpackListener implements Listener {
                 // Evitar swaps usando hotkey desde la parte inferior apuntando a slots de almacenamiento superiores
                 if (event.getClick().name().contains("NUMBER_KEY") && event.getView().getTopInventory().getHolder() instanceof BackpackGUI.BackpackHolder) {
                     int rawSlot = event.getRawSlot();
-                    if (rawSlot >= 0 && rawSlot < 27) {
+                    int unlockedRows = data.getUnlockedSlots();
+                    int storageSlots = unlockedRows * 9;
+                    if (rawSlot >= 0 && rawSlot < storageSlots) {
                         int button = event.getHotbarButton();
                         if (button >= 0 && button < 9) {
                             ItemStack hotbarItem = player.getInventory().getItem(button);
