@@ -97,14 +97,14 @@ public class LocationsManager {
      * Remueve la ubicación registrada de un bloque si existe.
      * @return true si se removió correctamente, false si no estaba registrada.
      */
-    public boolean removeLocation(Block block) {
+    public BackpackLocation removeLocation(Block block) {
         String key = block.getWorld().getName() + ":" + block.getX() + ":" + block.getY() + ":" + block.getZ();
         if (locations.containsKey(key)) {
-            locations.remove(key);
+            BackpackLocation loc = locations.remove(key);
             saveLocations();
-            return true;
+            return loc;
         }
-        return false;
+        return null;
     }
 
     /**

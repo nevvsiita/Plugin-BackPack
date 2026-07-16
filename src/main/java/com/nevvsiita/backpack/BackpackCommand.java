@@ -120,10 +120,11 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
 
-                plugin.getLocationsManager().addLocation(looking, skinKey);
+                 plugin.getLocationsManager().addLocation(looking, skinKey);
                 
                 String skinDisplayName = skinsSection.getString(skinKey + ".name", skinKey);
-                player.sendMessage(prefix + getMsg("messages.loc-added").replace("%skin_name%", skinDisplayName));
+                String rawMsg = plugin.getConfig().getString("messages.loc-added");
+                player.sendMessage(BackpackGUI.translateColors(prefix + rawMsg.replace("%skin_name%", skinDisplayName)));
                 return true;
             }
 
@@ -141,9 +142,15 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
 
-                boolean removed = plugin.getLocationsManager().removeLocation(looking);
-                if (removed) {
-                    player.sendMessage(prefix + getMsg("messages.loc-removed"));
+                LocationsManager.BackpackLocation removedLoc = plugin.getLocationsManager().removeLocation(looking);
+                if (removedLoc != null) {
+                    String skinDisplayName = removedLoc.getSkinKey();
+                    ConfigurationSection skinsSection = plugin.getConfig().getConfigurationSection("backpack-skins");
+                    if (skinsSection != null) {
+                        skinDisplayName = skinsSection.getString(removedLoc.getSkinKey() + ".name", removedLoc.getSkinKey());
+                    }
+                    String rawMsg = plugin.getConfig().getString("messages.loc-removed");
+                    player.sendMessage(BackpackGUI.translateColors(prefix + rawMsg.replace("%skin_name%", skinDisplayName)));
                 } else {
                     player.sendMessage(prefix + getMsg("messages.no-loc-here"));
                 }
