@@ -214,6 +214,10 @@ public class BackpackManager {
         }
 
         public boolean hasSkinUnlocked(String skin) {
+            if (skin == null) return false;
+            if (skin.equalsIgnoreCase("gray")) {
+                return true;
+            }
             return unlockedSkins.contains(skin);
         }
 
