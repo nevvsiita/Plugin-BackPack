@@ -27,8 +27,8 @@ backpack-display:
   position:
     # Desplazamiento lateral (0 = centrado)
     x: 0.0
-    # Altura (-0.80 = a la altura de la espalda)
-    y: -0.80
+    # Altura relativa al torso (0.0 = a la altura media de la espalda)
+    y: 0.0
     # Distancia hacia atrás (-0.22 = pegada a la espalda)
     z: -0.22
   # Ajustes de rotación (en grados)

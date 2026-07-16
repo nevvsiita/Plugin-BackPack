@@ -1,6 +1,7 @@
 package com.nevvsiita.backpack;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -30,6 +31,17 @@ public class BackpackDisplayManager {
     }
 
     public void startTask() {
+        // Tarea de teletransporte (cada tick para máxima fluidez y suavidad)
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    tickTeleport(player);
+                }
+            }
+        }.runTaskTimer(plugin, 1L, 1L);
+
+        // Tarea de verificación de inventarios (cada segundo para optimizar recursos)
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -37,14 +49,14 @@ public class BackpackDisplayManager {
                     updateDisplay(player);
                 }
             }
-        }.runTaskTimer(plugin, 20L, 20L); // Ejecutar cada segundo (20 ticks)
+        }.runTaskTimer(plugin, 20L, 20L);
     }
 
     public void updateDisplay(Player player) {
         UUID uuid = player.getUniqueId();
         FileConfiguration config = plugin.getConfig();
 
-        // Si el renderizado en la espalda está deshabilitado, quitar si tiene
+        // Si el renderizado está deshabilitado, quitar la mochila de la espalda
         if (!config.getBoolean("backpack-display.enabled", true)) {
             removeDisplay(player);
             return;
@@ -56,7 +68,7 @@ public class BackpackDisplayManager {
             return;
         }
 
-        // Si tiene mochila, obtener su color activo
+        // Obtener el aspecto activo de la mochila
         String skinKey = getSkinKey(backpackInInventory);
         if (skinKey == null) {
             skinKey = "gray";
@@ -66,7 +78,7 @@ public class BackpackDisplayManager {
         if (display == null || !display.isValid()) {
             spawnDisplay(player, skinKey);
         } else {
-            // Verificar si el color mostrado coincide con el color actual o si cambió la config
+            // Actualizar color si cambió
             ItemStack displayedItem = display.getItemStack();
             String displayedSkin = getSkinKey(displayedItem);
             if (!skinKey.equalsIgnoreCase(displayedSkin)) {
@@ -74,51 +86,91 @@ public class BackpackDisplayManager {
                 display.setItemStack(newHead);
             }
             
-            // Aplicar transformaciones actualizadas por si recargó config
+            // Recargar transformaciones
             applyTransformations(display, config);
-            
-            // Asegurarse de que sigue siendo pasajero
-            if (!player.getPassengers().contains(display)) {
-                player.addPassenger(display);
-            }
         }
+    }
+
+    private void tickTeleport(Player player) {
+        UUID uuid = player.getUniqueId();
+        ItemDisplay display = activeDisplays.get(uuid);
+        if (display == null || !display.isValid()) {
+            return;
+        }
+
+        // Si cambió de mundo, teletransportarlo rápido al nuevo mundo
+        if (!player.getWorld().equals(display.getWorld())) {
+            display.teleport(player.getLocation());
+            return;
+        }
+
+        FileConfiguration config = plugin.getConfig();
+        double yaw = player.getLocation().getYaw();
+        double yawRad = Math.toRadians(yaw);
+
+        // Vector unitario hacia adelante del jugador
+        double frontX = -Math.sin(yawRad);
+        double frontZ = Math.cos(yawRad);
+
+        // Vector unitario hacia la derecha
+        double rightX = -Math.cos(yawRad);
+        double rightZ = -Math.sin(yawRad);
+
+        // Cargar offsets de la configuración
+        double ox = config.getDouble("backpack-display.position.x", 0.0);
+        // Posición base de la espalda: 0.9 bloques sobre el suelo + offset Y
+        double oy = 0.9 + config.getDouble("backpack-display.position.y", 0.0);
+        double oz = config.getDouble("backpack-display.position.z", -0.22);
+
+        // Calcular posición final
+        double finalX = player.getLocation().getX() + (frontX * oz) + (rightX * ox);
+        double finalY = player.getLocation().getY() + oy;
+        double finalZ = player.getLocation().getZ() + (frontZ * oz) + (rightZ * ox);
+
+        Location targetLoc = new Location(
+                player.getWorld(),
+                finalX,
+                finalY,
+                finalZ,
+                (float) (yaw + config.getDouble("backpack-display.rotation.y", 180.0)),
+                0.0f
+        );
+
+        display.teleport(targetLoc);
     }
 
     private void spawnDisplay(Player player, String skinKey) {
         UUID uuid = player.getUniqueId();
         FileConfiguration config = plugin.getConfig();
         
-        // Spawnear ItemDisplay
         ItemDisplay display = player.getWorld().spawn(player.getLocation(), ItemDisplay.class, ent -> {
             ent.setGravity(false);
             ent.setInvulnerable(true);
             
-            // Establecer el item (cabeza de mochila)
+            // Suavizar teletransportaciones a 1 tick para evitar tirones visuales
+            ent.setTeleportDuration(1);
+            
             ItemStack head = createHeadItem(skinKey);
             ent.setItemStack(head);
             
-            // Aplicar transformaciones y modo de transform de la config
             applyTransformations(ent, config);
         });
 
         activeDisplays.put(uuid, display);
-        player.addPassenger(display);
+        // Teletransportar al instante para colocarlo en su posición inicial
+        tickTeleport(player);
     }
 
     private void applyTransformations(ItemDisplay display, FileConfiguration config) {
-        // Cargar coordenadas de traslación
-        float px = (float) config.getDouble("backpack-display.position.x", 0.0);
-        float py = (float) config.getDouble("backpack-display.position.y", -0.80);
-        float pz = (float) config.getDouble("backpack-display.position.z", -0.22);
-        Vector3f translation = new Vector3f(px, py, pz);
+        // La traslación es (0,0,0) porque el teletransporte se hace directamente a las coordenadas finales
+        Vector3f translation = new Vector3f(0.0f, 0.0f, 0.0f);
 
-        // Cargar ángulos de rotación en grados y convertirlos a radianes
+        // Pitch (X) y Roll (Z). El Yaw (Y) se maneja directamente en el teletransporte
         float rx = (float) Math.toRadians(config.getDouble("backpack-display.rotation.x", 0.0));
-        float ry = (float) Math.toRadians(config.getDouble("backpack-display.rotation.y", 180.0));
         float rz = (float) Math.toRadians(config.getDouble("backpack-display.rotation.z", 0.0));
-        Quaternionf leftRotation = new Quaternionf().rotationXYZ(rx, ry, rz);
+        Quaternionf leftRotation = new Quaternionf().rotationXYZ(rx, 0.0f, rz);
 
-        // Cargar escala
+        // Escala
         float sx = (float) config.getDouble("backpack-display.scale.x", 0.65);
         float sy = (float) config.getDouble("backpack-display.scale.y", 0.65);
         float sz = (float) config.getDouble("backpack-display.scale.z", 0.65);
@@ -127,7 +179,7 @@ public class BackpackDisplayManager {
         Transformation transform = new Transformation(translation, leftRotation, scale, new Quaternionf());
         display.setTransformation(transform);
 
-        // Aplicar modo de visualización de Minecraft
+        // Modo de display de Minecraft
         String modeStr = config.getString("backpack-display.transform", "FIXED");
         try {
             ItemDisplay.ItemDisplayTransform mode = ItemDisplay.ItemDisplayTransform.valueOf(modeStr.toUpperCase());
