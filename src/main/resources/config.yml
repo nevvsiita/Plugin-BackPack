@@ -55,6 +55,31 @@ backpack-item:
     - " <#FF8F8F>&l→ <#FFB09C>&lᴄ<#FFC0A2>&lʟ<#FFD0A9>&lɪ<#FFE0AF>&lᴄ<#FFE1A9>&lᴋ <#FFE49E>&lᴅ<#FFE597>&lᴇ<#FFE691>&lʀ<#F0EB96>&lᴇ<#E1F19A>&lᴄ<#D0F69E>&lʜ<#BEFAA3>&lᴏ <#A3FFB9>&lᴘ<#9EFFCA>&lᴀ<#98FFDB>&lʀ<#93FFEA>&lᴀ <#8AEEFC>&lᴀ<#87DCFE>&lʙ<#84CBFE>&lʀ<#81B9FF>&lɪ<#7EA7FF>&lʀ"
     - "&8&m---------------------------------"
 
+# Botón de mejoras de espacio (slot 33 - fila 4)
+upgrade-button:
+  material: "PLAYER_HEAD"
+  hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2RkM2NlMTM3YTc4NTcxZThlYzY1NWJhN2ZkMDc1ZjQ5ZjRiZDI5YWY1NWY2ZDNlY2FhYWY0MWJhNzE5ZCJ9fX0="
+  name: "<#FFE0AF>&lᴍᴇᴊᴏʀᴀʀ ᴄᴀᴘᴀᴄɪᴅᴀᴅ</gradient>"
+  cost-row-2: 5000
+  cost-row-3: 15000
+  lore:
+    - "&8&m---------------------------------"
+    - " &7¡Mejora la capacidad de tu mochila!"
+    - ""
+    - " &fCapacidad actual: &e%current_rows% Fila(s) (%current_slots% slots)"
+    - " &fSiguiente nivel: &a%next_rows% Fila(s) (%next_slots% slots)"
+    - " &fCosto de mejora: &6$%cost%"
+    - ""
+    - " &e&l→ ¡Haz clic para comprar la mejora!"
+    - "&8&m---------------------------------"
+  lore-maxed:
+    - "&8&m---------------------------------"
+    - " &7¡Mejora la capacidad de tu mochila!"
+    - ""
+    - " &fCapacidad actual: &e3 Filas (27 slots)"
+    - " &a&l¡Capacidad máxima alcanzada!"
+    - "&8&m---------------------------------"
+
 # Ítem del botón para abrir el selector de colores (slot 31 - centro de la fila 4)
 # Con degradado gris en Small Caps y sin descripción (lore vacío)
 color-button:
@@ -114,6 +139,7 @@ messages:
   skin-locked-find: "&cᴅᴇʙᴇs ᴇɴᴄᴏɴᴛʀᴀʀ ᴇsᴛᴇ ᴀsᴘᴇᴄᴛᴏ ᴇsᴄᴏɴᴅɪᴅᴏ ᴇɴ ᴇʟ ᴍᴀᴘᴀ ᴘᴀʀᴀ ᴅᴇsʙb501ʟᴏQᴜᴇᴀʀʟᴏ."
   skin-equipped: "&a¡ʜᴀs ᴇϙᴜɪᴘᴀᴅᴏ ᴇʟ ᴀsᴘᴇᴄᴛᴏ %skin_name%&a!"
   loc-added: "&aᴜʙɪᴄᴀᴄɪᴏɴ ʀᴇɢɪsᴛʀᴀᴅᴀ ᴄᴏᴍᴏ ᴘᴜɴᴛᴏ ᴅᴇ ᴅᴇsʙbʟᴏQᴜᴇᴀʀ ᴘᴀʀᴀ %skin_name%&a."
+  upgrade-success: "&a¡Enhorabuena! Has mejorado tu mochila a &e%rows% filas &apor &6$%cost%&a!"
   loc-removed: "&c... &c."
   no-block-looking: "&c... &c."
   no-loc-here: "&cɴᴏ ʜᴀʏ ɴɪɴɢᴜɴᴀ ᴍᴏᴄʜɪʟᴀ ʀᴇɢɪsᴛʀᴀᴅᴀ ᴇɴ ᴇsᴛᴇ ʙʟᴏϙᴜᴇ."

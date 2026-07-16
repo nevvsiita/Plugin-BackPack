@@ -3,6 +3,7 @@ package com.nevvsiita.backpack;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -85,6 +86,7 @@ public class BackpackListener implements Listener {
         if (inventory.getHolder() instanceof BackpackGUI.BackpackHolder) {
             BackpackGUI.BackpackHolder holder = (BackpackGUI.BackpackHolder) inventory.getHolder();
             int slot = event.getSlot();
+            BackpackManager.BackpackData data = plugin.getBackpackManager().getBackpack(player.getUniqueId());
 
             // Bloquear que interactúen con la propia mochila que está abierta en su inventario
             if (clickedInventory.getType() == org.bukkit.event.inventory.InventoryType.PLAYER) {
@@ -97,6 +99,12 @@ public class BackpackListener implements Listener {
             // 1. Click en la parte superior (la mochila)
             if (clickedInventory.getHolder() instanceof BackpackGUI.BackpackHolder) {
                 if (slot < 27) {
+                    int unlockedRows = data.getUnlockedSlots();
+                    if (BackpackGUI.isSlotLocked(slot, unlockedRows)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+
                     // Evitar meter arrastrando con cursor
                     if (isForbiddenItem(event.getCursor())) {
                         event.setCancelled(true);
@@ -127,6 +135,9 @@ public class BackpackListener implements Listener {
                     if (slot == 31) {
                         // Abrir el selector de skins
                         plugin.getBackpackGUI().openSkinSelector(player, holder.getBackpackItem(), holder.getSlot());
+                    } else if (slot == 33) {
+                        // Comprar mejora de espacio
+                        tryUpgradeBackpack(player, data, holder);
                     }
                 }
             } else {
@@ -302,10 +313,14 @@ public class BackpackListener implements Listener {
         Inventory inventory = event.getInventory();
         if (inventory.getHolder() instanceof BackpackGUI.BackpackHolder) {
             int size = inventory.getSize();
+            Player player = (Player) event.getWhoClicked();
+            BackpackManager.BackpackData data = plugin.getBackpackManager().getBackpack(player.getUniqueId());
+            int unlockedRows = data.getUnlockedSlots();
+            int storageSlots = unlockedRows * 9;
 
             for (int rawSlot : event.getRawSlots()) {
                 if (rawSlot < size) {
-                    if (rawSlot >= 27) {
+                    if (rawSlot >= storageSlots) {
                         event.setCancelled(true);
                         return;
                     }
@@ -332,11 +347,17 @@ public class BackpackListener implements Listener {
         }
 
         Player player = (Player) event.getPlayer();
-        // Guardar ítems de los slots 0-26 en el Ender Chest del jugador
-        ItemStack[] enderChestContents = new ItemStack[27];
+        BackpackManager.BackpackData data = plugin.getBackpackManager().getBackpack(player.getUniqueId());
+        int unlockedRows = data.getUnlockedSlots();
+        int storageSlots = unlockedRows * 9;
+
+        // Guardar ítems de los slots de almacenamiento de la GUI al Ender Chest
+        ItemStack[] enderChestContents = player.getEnderChest().getContents();
         for (int i = 0; i < 27; i++) {
-            ItemStack item = inventory.getItem(i);
-            enderChestContents[i] = (item != null && item.getType() != org.bukkit.Material.AIR) ? item.clone() : null;
+            if (i < storageSlots) {
+                ItemStack item = inventory.getItem(i);
+                enderChestContents[i] = (item != null && item.getType() != org.bukkit.Material.AIR) ? item.clone() : null;
+            }
         }
         player.getEnderChest().setContents(enderChestContents);
 
@@ -509,6 +530,49 @@ public class BackpackListener implements Listener {
                 // Ignorar
             }
         }
+    }
+
+    private void tryUpgradeBackpack(Player player, BackpackManager.BackpackData data, BackpackGUI.BackpackHolder holder) {
+        int currentRows = data.getUnlockedSlots();
+        if (currentRows >= 3) {
+            playConfigSound(player, "sounds.unlock-fail", "ENTITY_VILLAGER_NO");
+            return;
+        }
+
+        int nextRows = currentRows + 1;
+        FileConfiguration config = plugin.getConfig();
+        int cost = nextRows == 2 ? config.getInt("upgrade-button.cost-row-2", 5000) : config.getInt("upgrade-button.cost-row-3", 15000);
+
+        // Verificar dinero usando Vault
+        if (plugin.getVaultHook() != null && plugin.getVaultHook().hasEconomy()) {
+            double balance = plugin.getVaultHook().getBalance(player);
+            if (balance < cost) {
+                String noFundsMsg = config.getString("messages.no-funds", "&cNo tienes suficiente dinero. Necesitas &e$%cost%&c.")
+                        .replace("%cost%", String.valueOf(cost));
+                player.sendMessage(translateColors(config.getString("messages.prefix") + noFundsMsg));
+                playConfigSound(player, "sounds.unlock-fail", "ENTITY_VILLAGER_NO");
+                return;
+            }
+
+            // Descontar dinero
+            plugin.getVaultHook().withdraw(player, cost);
+        }
+
+        // Actualizar progreso de filas del jugador
+        data.setUnlockedSlots(nextRows);
+        plugin.getBackpackManager().saveBackpack(player.getUniqueId());
+
+        // Mensaje de éxito
+        String successMsg = config.getString("messages.upgrade-success", "&a¡Enhorabuena! Has mejorado tu mochila a &e%rows% filas &apor &6$%cost%&a!")
+                .replace("%rows%", String.valueOf(nextRows))
+                .replace("%cost%", String.valueOf(cost));
+        player.sendMessage(translateColors(config.getString("messages.prefix") + successMsg));
+
+        // Sonido de éxito
+        playConfigSound(player, "sounds.unlock-success", "ENTITY_PLAYER_LEVELUP");
+
+        // Refrescar GUI
+        plugin.getBackpackGUI().openGUI(player, holder.getBackpackItem(), holder.getSlot());
     }
 
     private String translateColors(String text) {

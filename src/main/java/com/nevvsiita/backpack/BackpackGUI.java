@@ -94,12 +94,99 @@ public class BackpackGUI {
     }
 
     /**
+    /**
+     * Comprueba si una ranura de almacenamiento (0-26) está bloqueada según el progreso.
+     */
+    public static boolean isSlotLocked(int slot, int unlockedRows) {
+        if (slot < 9) return false; // Fila 1 siempre desbloqueada
+        if (slot >= 9 && slot < 18) return unlockedRows < 2; // Fila 2 requiere nivel >= 2
+        if (slot >= 18 && slot < 27) return unlockedRows < 3; // Fila 3 requiere nivel >= 3
+        return false;
+    }
+
+    /**
+     * Crea un panel de ranura bloqueada con la configuración del config.
+     */
+    private ItemStack createLockedItem(String configPath) {
+        FileConfiguration config = plugin.getConfig();
+        String materialName = config.getString(configPath + ".material", "RED_STAINED_GLASS_PANE");
+        Material material = Material.matchMaterial(materialName);
+        if (material == null) material = Material.RED_STAINED_GLASS_PANE;
+
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(translateColors(config.getString(configPath + ".name", "&c&lRanura Bloqueada")));
+            List<String> lore = config.getStringList(configPath + ".lore");
+            List<String> coloredLore = new ArrayList<>();
+            for (String line : lore) {
+                coloredLore.add(translateColors(line));
+            }
+            meta.setLore(coloredLore);
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
+    /**
+     * Crea el botón de mejoras de espacio.
+     */
+    private ItemStack createUpgradeButton(int currentRows) {
+        FileConfiguration config = plugin.getConfig();
+        String hdbId = config.getString("upgrade-button.hdb-id");
+        ItemStack head = null;
+        if (plugin.getHdbHook() != null && hdbId != null && !hdbId.isEmpty()) {
+            head = plugin.getHdbHook().getHead(hdbId);
+        }
+        if (head == null) {
+            head = new ItemStack(Material.PLAYER_HEAD);
+        }
+
+        ItemMeta meta = head.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(translateColors(config.getString("upgrade-button.name", "&6&lᴍᴇᴊᴏʀᴀʀ ᴇsᴘᴀᴄɪᴏ")));
+            List<String> lore = new ArrayList<>();
+            if (currentRows >= 3) {
+                List<String> maxLore = config.getStringList("upgrade-button.lore-maxed");
+                for (String line : maxLore) {
+                    lore.add(translateColors(line));
+                }
+            } else {
+                int nextRows = currentRows + 1;
+                int currentSlots = currentRows * 9;
+                int nextSlots = nextRows * 9;
+                int cost = nextRows == 2 ? config.getInt("upgrade-button.cost-row-2", 5000) : config.getInt("upgrade-button.cost-row-3", 15000);
+
+                List<String> upLore = config.getStringList("upgrade-button.lore");
+                for (String line : upLore) {
+                    String formatted = line
+                            .replace("%current_rows%", String.valueOf(currentRows))
+                            .replace("%current_slots%", String.valueOf(currentSlots))
+                            .replace("%next_rows%", String.valueOf(nextRows))
+                            .replace("%next_slots%", String.valueOf(nextSlots))
+                            .replace("%cost%", String.valueOf(cost));
+                    lore.add(translateColors(formatted));
+                }
+            }
+            meta.setLore(lore);
+            head.setItemMeta(meta);
+        }
+        return head;
+    }
+
+    /**
      * Abre el inventario de la mochila desde un item físico específico.
      */
     public void openGUI(Player player, ItemStack backpackItem, int slot) {
         UUID uuid = player.getUniqueId();
+        BackpackManager.BackpackData data = plugin.getBackpackManager().getBackpack(uuid);
         FileConfiguration config = plugin.getConfig();
-        int size = 36; // Forzar tamaño de 4 filas
+
+        int unlockedRows = data.getUnlockedSlots(); // 1, 2 o 3
+        if (unlockedRows < 1) unlockedRows = 1;
+        if (unlockedRows > 3) unlockedRows = 3;
+
+        int size = (unlockedRows + 1) * 9; // e.g. 18, 27 o 36
 
         String title = config.getString("gui.title", "<gradient:#a18cd1:#fa97c4>&lᴍᴏᴄʜɪʟᴀ</gradient> %player%");
         title = title.replace("%player%", player.getName());
@@ -108,21 +195,25 @@ public class BackpackGUI {
         BackpackHolder holder = new BackpackHolder(uuid, 1, backpackItem, slot);
         Inventory inventory = Bukkit.createInventory(holder, size, title);
 
-        // Copiar los contenidos del ender chest del jugador a los primeros 27 slots (0-26)
+        int storageSlots = unlockedRows * 9;
+
+        // Cargar los items de la mochila respetando ranuras desbloqueadas
         ItemStack[] ecContents = player.getEnderChest().getContents();
-        for (int i = 0; i < 27; i++) {
+        for (int i = 0; i < storageSlots; i++) {
             if (i < ecContents.length && ecContents[i] != null) {
                 inventory.setItem(i, ecContents[i].clone());
             }
         }
 
-        // Llenar la última fila (27-35) con el botón del selector de color y separadores
-        for (int i = 27; i < size; i++) {
-            if (i == 31) {
-                // Botón del selector de skins
+        // Llenar la última fila con el botón del selector de color, el botón de mejoras y separadores
+        int controlStart = storageSlots;
+        for (int i = controlStart; i < size; i++) {
+            int relative = i - controlStart;
+            if (relative == 4) {
                 inventory.setItem(i, createColorButton());
+            } else if (relative == 6) {
+                inventory.setItem(i, createUpgradeButton(unlockedRows));
             } else {
-                // Paneles divisores
                 inventory.setItem(i, createSeparatorItem());
             }
         }
