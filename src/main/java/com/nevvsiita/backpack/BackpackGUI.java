@@ -355,22 +355,26 @@ public class BackpackGUI {
                     }
 
 
-                    if (currentSkin.equalsIgnoreCase(key)) {
-                        // Aspecto equipado actualmente
-                        List<String> eqLore = config.getStringList("skin-selector-gui.status.equipped.lore");
-                        for (String line : eqLore) {
-                            lore.add(translateColors(line));
-                        }
-                        Enchantment unbreaking = Registry.ENCHANTMENT.get(NamespacedKey.minecraft("unbreaking"));
-                        if (unbreaking != null) {
-                            meta.addEnchant(unbreaking, 1, true);
-                        }
-                        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                    } else if (data.hasSkinUnlocked(key)) {
-                        // Skin desbloqueada pero no equipada
-                        List<String> unLore = config.getStringList("skin-selector-gui.status.unlocked.lore");
-                        for (String line : unLore) {
-                            lore.add(translateColors(line));
+                    boolean hasUnlocked = data.hasSkinUnlocked(key);
+
+                    if (hasUnlocked) {
+                        if (currentSkin.equalsIgnoreCase(key)) {
+                            // Aspecto equipado actualmente
+                            List<String> eqLore = config.getStringList("skin-selector-gui.status.equipped.lore");
+                            for (String line : eqLore) {
+                                lore.add(translateColors(line));
+                            }
+                            Enchantment unbreaking = Registry.ENCHANTMENT.get(NamespacedKey.minecraft("unbreaking"));
+                            if (unbreaking != null) {
+                                meta.addEnchant(unbreaking, 1, true);
+                            }
+                            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                        } else {
+                            // Skin desbloqueada pero no equipada
+                            List<String> unLore = config.getStringList("skin-selector-gui.status.unlocked.lore");
+                            for (String line : unLore) {
+                                lore.add(translateColors(line));
+                            }
                         }
                     } else {
                         // Skin bloqueada
