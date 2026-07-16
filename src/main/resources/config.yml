@@ -127,7 +127,7 @@ messages:
   prefix: "&8[&bʙᴀᴄᴋᴘᴀᴄᴋ&7] &r"
   no-permission: "&cɴᴏ ᴛɪᴇɴᴇs ᴘᴇʀᴍɪsᴏs ᴘᴀʀᴀ ᴜsᴀʀ ᴇsᴛᴇ ᴄᴏᴍᴀɴᴅᴏ."
   only-players: "&cᴇsᴛᴇ ᴄᴏᴍᴀɴᴅᴏ sᴏʟᴏ ᴘᴜᴇᴅᴇ sᴇʀ ᴇᴊᴇᴄᴜᴛᴀᴅᴏ ᴘᴏʀ ᴊᴜɢᴀᴅᴏʀᴇs."
-  no-funds: "&cɴᴏ ᴛɪᴇɴᴇs sᴜғɪᴄɪᴇɴᴛᴇ ᴅɪɴᴇʀᴏ. ɴᴇᴄᴇsɪᴛᴀs &e$%cost%&c."
+  no-funds: "&c&oEl sastre de mochilas suspira: &7\"Eso no es suficiente oro, viajero. Necesitas al menos &6$%cost% &7para pagar mis costuras y ampliar tu espacio.\""
   slot-unlocked: "&a¡ʜᴀѕ ᴅᴇѕʙbʟᴏǫᴜᴇᴀᴅᴏ ᴜɴᴀ ɴᴜᴇᴠᴀ ʀᴀɴᴜʀᴀ ᴘᴏʀ &e$%cost%&a!"
   slot-locked-previous: "&c¡ᴅᴇѕʙᴇѕ ᴅᴇѕʙʟᴏǫᴜᴇᴀʀ ʟᴀs ʀᴀɴᴜʀᴀs ᴀɴᴛᴇʀɪᴏʀᴇs ᴘʀɪᴍᴇʀᴏ!"
   data-saved: "&aʟᴏs ᴅᴀᴛᴏs ᴅᴇ ᴛᴜ ᴍᴏᴄʜɪʟᴀ ʜᴀɴ sɪᴅᴏ ɢᴜᴀʀᴅᴀᴅᴏs."
