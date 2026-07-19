@@ -9,6 +9,28 @@ gui:
   # Tamaño del inventario. FIJADO EN 36 para diseño de 4 filas.
   # (25 ranuras de almacenamiento en diseño centrado, botones de control simétricos)
   size: 36
+  # Botón para mostrar/ocultar la mochila visual en la espalda
+  visibility-button:
+    show:
+      material: "PLAYER_HEAD"
+      hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTkyZTMxZmYyNDA3YTQ5M2NhYjI0N2NjOWFjM2ZjYTkwNDMyMWJhYzMxYWIxMWNlMmY5NzFjZjI3M2E5ZCJ9fX0="
+      name: "&aVisualización: &lMOSTRAR"
+      lore:
+        - "&8&m---------------------------------"
+        - " &7La mochila se muestra en tu espalda."
+        - ""
+        - " &e&l→ Haz clic para ocultarla"
+        - "&8&m---------------------------------"
+    hide:
+      material: "PLAYER_HEAD"
+      hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmViNTg4YjBiNDA5NzhjNzUxMDQ3YTQyODUsN2NhN2VkY2QyM2VjOTI5ODg3MzdmYTY1OGY5ZDU0YjcyYTFhIn19fQ=="
+      name: "&cVisualización: &lOCULTAR"
+      lore:
+        - "&8&m---------------------------------"
+        - " &7La mochila está oculta en tu espalda."
+        - ""
+        - " &e&l→ Haz clic para mostrarla"
+        - "&8&m---------------------------------"
 
 # Ajustes de cooldowns del plugin (en segundos)
 cooldowns:
@@ -23,6 +45,10 @@ backpack-display:
   # HEAD: Sigue la orientación de la cabeza (puede rotar y girar al mirar arriba/abajo).
   # FIXED: Fijo respecto al cuerpo del jugador (¡RECOMENDADO para evitar que gire raro al caminar!).
   transform: "FIXED"
+  # Compensación de retraso de renderizado (lag-compensation).
+  # Ajusta qué tan adelante se proyecta la mochila al correr para sincronizarla con el cliente.
+  # 1.5 es el valor recomendado. 0.0 para desactivar.
+  lag-compensation: 1.5
   # Ajustes de posición de la mochila (desplazamientos relativos al jugador)
   position:
     # Desplazamiento lateral (0 = centrado)
