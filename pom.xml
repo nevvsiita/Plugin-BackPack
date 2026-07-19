@@ -11,10 +11,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <repositories>
-        <!-- Spigot Repository -->
+        <!-- Purpur Repository -->
         <repository>
-            <id>spigotmc-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <id>purpurmc-repo</id>
+            <url>https://repo.purpurmc.org/snapshots</url>
         </repository>
         <!-- Sonatype Repository -->
         <repository>
@@ -28,11 +28,11 @@
         </repository>
     </repositories>
     <dependencies>
-        <!-- Spigot API -->
+        <!-- Purpur API -->
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.21-R0.1-SNAPSHOT</version>
+            <groupId>org.purpurmc.purpur</groupId>
+            <artifactId>purpur-api</artifactId>
+            <version>1.21.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <!-- Vault API -->
