@@ -32,6 +32,28 @@ gui:
         - " &e&l→ Haz clic para mostrarla"
         - "&8&m---------------------------------"
 
+# Ajustes de la animación de carga al abrir la mochila
+backpack-opening:
+  enabled: true
+  delay: 1.5
+  update-interval: 3
+  cancel-on-move: false
+  cancel-on-damage: false
+  cancel-on-item-swap: false
+  messages:
+    already-opening: "&7&lʙᴀᴄᴋᴘᴀᴄᴋ &8» &c¡Tu backpack ya se está abriendo!"
+    cancelled: "&7&lʙᴀᴄᴋᴘᴀᴄᴋ &8» &cLa apertura ha sido interrumpida."
+    progress: "&7&lʙᴀᴄᴋᴘᴀᴄᴋ &8» &r%bar% &7%percent%%"
+  bar:
+    length: 10
+    char-filled: "●"
+    char-empty: "○"
+  sound:
+    enabled: true
+    name: "BLOCK_NOTE_BLOCK_PLING"
+    pitch-start: 0.5
+    pitch-end: 1.5
+
 # Ajustes de cooldowns del plugin (en segundos)
 cooldowns:
   # Tiempo de espera para cambiar de color/aspecto de mochila
@@ -40,7 +62,7 @@ cooldowns:
 # Ajustes de renderizado de la mochila en la espalda del jugador
 backpack-display:
   # Habilitar o deshabilitar mostrar la mochila en la espalda
-  enabled: true
+  enabled: false
   # Modo de transformación de Minecraft (HEAD, FIXED, NONE, GROUND, etc.)
   # HEAD: Sigue la orientación de la cabeza (puede rotar y girar al mirar arriba/abajo).
   # FIXED: Fijo respecto al cuerpo del jugador (¡RECOMENDADO para evitar que gire raro al caminar!).
@@ -146,6 +168,19 @@ upgrade-button:
     - " &a&l¡Capacidad máxima alcanzada!"
     - "&8&m---------------------------------"
 
+# Ítem del botón para auto-ordenar el inventario de la mochila (slot 29)
+sort-button:
+  material: "PLAYER_HEAD"
+  hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzdhMGVlYTJkNzg0Y2EyMTU3MjUxNzc1MmMyYzFjOWE2ZmRiNmM2YjVhZjMyNGNmYzM3NmJkYjNhZjhjNWVjIn19fQ=="
+  name: "<gradient:#A6C1EE:#B8FFC8>&lᴏʀᴅᴇɴᴀʀ ɪɴᴠᴇɴᴛᴀʀɪᴏ</gradient>"
+  lore:
+    - "&8&m---------------------------------"
+    - " &7ᴏʀᴅᴇɴᴀ ʟᴏs ɪᴛᴇᴍs ᴅᴇ ᴛᴜ ᴍᴏᴄʜɪʟᴀ"
+    - " &7ᴀᴜᴛᴏᴍᴀᴛɪᴄᴀᴍᴇɴᴛᴇ."
+    - ""
+    - " &e&l→ ᴄʟɪᴄᴋ ᴘᴀʀᴀ ᴏʀᴅᴇɴᴀʀ"
+    - "&8&m---------------------------------"
+
 # Ítem del botón para abrir el selector de colores (slot 31 - centro de la fila 4)
 # Con degradado gris en Small Caps y sin descripción (lore vacío)
 color-button:
@@ -153,6 +188,29 @@ color-button:
   hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWU2NjM2OTI4NWU5OWNmMzdjNDQyM2Y3YWY2ODEyZGRlYjc5MGI5NzQ3NWFhZmJkNTY1MGJlZTQ0N2EyZGE0NyJ9fX0="
   name: "<#FF8F8F>&lᴄ<#FFA095>&lᴀ<#FFB09C>&lᴍ<#FFC0A2>&lʙ<#FFD0A9>&lɪ<#FFE0AF>&lᴀ<#FFE2A8>&lʀ <#FFE599>&lᴄ<#FFE691>&lᴏ<#F0EB96>&lʟ<#E1F19A>&lᴏ<#D0F69E>&lʀ <#A9FFA7>&l/ <#9BFFD2>&lᴀ<#94FFE7>&lѕ<#8DFFFA>&lᴘ<#8AEEFC>&lᴇ<#87DCFE>&lᴄ<#84CBFE>&lᴛ<#81B9FF>&lᴏ  "
   lore: []
+
+# Botón de seguridad / privacidad de la mochila (Pública vs Privada)
+privacy-button:
+  public:
+    material: "PLAYER_HEAD"
+    hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjA5ZDZhMzQ4YTk5MjNlYmJiMzQyM2IxOTY5NzNkNDk1YjFhYTVjMDU2ZTRiMzUxYjEyMGQzNmQ4MzMxYTU0MiJ9fX0="
+    name: "&aSeguridad: &lPÚBLICA"
+    lore:
+      - "&8&m---------------------------------"
+      - " &7Cualquier jugador puede abrir esta mochila."
+      - ""
+      - " &e&l→ Haz clic para hacerla PRIVADA"
+      - "&8&m---------------------------------"
+  private:
+    material: "PLAYER_HEAD"
+    hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODUyZDNjNWM4YzUyOGU2NTAwOGUyNjBlYTQwYTQ0NzYwMjdhYmUyMjYxMWQ5ZmM3ODEwMTA3MWJmMDU2NDA1MCJ9fX0="
+    name: "&cSeguridad: &lPRIVADA"
+    lore:
+      - "&8&m---------------------------------"
+      - " &7Solo el propietario puede abrir esta mochila."
+      - ""
+      - " &e&l→ Haz clic para hacerla PÚBLICA"
+      - "&8&m---------------------------------"
 
 # Ajustes de los botones de navegación de páginas (slots 28 y 34)
 page-buttons:
@@ -188,7 +246,7 @@ page-buttons:
 
 # Mensajes del plugin (soporta códigos de color)
 messages:
-  prefix: "&8[&bBackPack&7] &r"
+  prefix: "&7&lʙᴀᴄᴋᴘᴀᴄᴋ &8» &r"
   no-permission: "&cNo tienes permisos para usar este comando."
   only-players: "&cEste comando solo puede ser ejecutado por jugadores."
   no-funds: "&c&oEl sastre de mochilas suspira: &7\"Eso no es suficiente oro, viajero. Necesitas al menos &6$%cost% &7para pagar mis costuras y ampliar tu espacio.\""
@@ -312,6 +370,10 @@ backpack-skins:
     hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmNlMDE2OTlmNzk2Y2JkZTk1Yzg0OWJlZTNjYzM2OTg3ODQ1MmI0MGE0MTE0NDM2NmQ2NmI0YTA4MjZjZmFhMCJ9fX0="
     name: "<gradient:#e74c3c:#c0392b>&lʙᴀᴄᴋᴘᴀᴄᴋ ʀᴏᴊᴀ</gradient>"
     particle-color: "255,0,0"
+  private_security:
+    hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODUyZDNjNWM4YzUyOGU2NTAwOGUyNjBlYTQwYTQ0NzYwMjdhYmUyMjYxMWQ5ZmM3ODEwMTA3MWJmMDU2NDA1MCJ9fX0="
+    name: "<gradient:#2D3748:#4A5568>&lʙᴀᴄᴋᴘᴀᴄᴋ sᴇɢᴜʀɪᴅᴀᴅ ᴘʀɪᴠᴀᴅᴀ</gradient>"
+    particle-color: "45,55,72"
   white:
     hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTJiYjM4NTE2YjI5NTA0MTg2ZTExNTU5Y2Q1MjUwYWUyMThkYjRkZGQyN2FlNDM4NzI2Yzg0N2NlNmIzYzk4In19fQ=="
     name: "<gradient:#ffffff:#bdc3c7>&lʙᴀᴄᴋᴘᴀᴄᴋ ʙʟᴀɴᴄᴀ</gradient>"
@@ -321,6 +383,6 @@ backpack-skins:
     name: "<gradient:#f1c40f:#f39c12>&lʙᴀᴄᴋᴘᴀᴄᴋ ᴀᴍᴀʀɪʟʟᴀ</gradient>"
     particle-color: "255,215,0"
   darkblue:
-    hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGRjYzZlYjQwZjNiYWRhNDFlNDMzOTg4OGQ2ZDIwNzQzNzU5OGJkYmQxNzVjMmU3MzExOTFkNWE5YTQyZDNjOCJ9fX0="
-    name: "<gradient:#2c3e50:#34495e>&lʙᴀᴄᴋᴘᴀᴄᴋ ᴀᴢᴜʟ ᴏsᴄᴜʀᴏ</gradient>"
+    hdb-id: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjA5ZDZhMzQ4YTk5MjNlYmJiMzQyM2IxOTY5NzNkNDk1YjFhYTVjMDU2ZTRiMzUxYjEyMGQzNmQ4MzMxYTU0MiJ9fX0="
+    name: "<gradient:#2c3e50:#34495e>&lʙᴀᴄᴋᴘᴀᴄᴋ sᴇɢᴜʀɪᴅᴀᴅ ᴘᴜʙʟɪᴄᴀ</gradient>"
     particle-color: "0,0,139"

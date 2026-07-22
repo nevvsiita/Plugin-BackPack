@@ -368,10 +368,15 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
         return createBackpackItem("gray");
     }
 
-    /**
-     * Construye el ítem físico de mochila con un aspecto (skin) determinado.
-     */
     public ItemStack createBackpackItem(String skinKey) {
+        return createBackpackItem((Player) null, skinKey, null);
+    }
+
+    public ItemStack createBackpackItem(Player player, String skinKey, UUID backpackId) {
+        return createBackpackItem(player, skinKey, backpackId, null);
+    }
+
+    public ItemStack createBackpackItem(Player player, String skinKey, UUID backpackId, String ownerName) {
         String hdbId = plugin.getConfig().getString("backpack-skins." + skinKey + ".hdb-id", "32281");
         String skinName = plugin.getConfig().getString("backpack-skins." + skinKey + ".name", "&8Mochila Gris");
         ItemStack item = null;
@@ -381,7 +386,15 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
         }
 
         if (item == null) {
-            item = new ItemStack(Material.CHEST);
+            item = new ItemStack(Material.PLAYER_HEAD);
+        }
+
+        if (backpackId == null) {
+            backpackId = UUID.randomUUID();
+        }
+
+        if (ownerName == null && player != null) {
+            ownerName = player.getName();
         }
 
         ItemMeta meta = item.getItemMeta();
@@ -397,9 +410,14 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
             }
             meta.setLore(coloredLore);
 
-            // Guardar la firma NBT
+            // Guardar la firma NBT, la skin key, el id de la mochila y el propietario
             PersistentDataContainer pdc = meta.getPersistentDataContainer();
             pdc.set(backpackKey, PersistentDataType.BYTE, (byte) 1);
+            pdc.set(new NamespacedKey(plugin, "backpack_skin"), PersistentDataType.STRING, skinKey);
+            pdc.set(new NamespacedKey(plugin, "backpack_id"), PersistentDataType.STRING, backpackId.toString());
+            if (ownerName != null && !ownerName.isEmpty()) {
+                pdc.set(new NamespacedKey(plugin, "backpack_owner"), PersistentDataType.STRING, ownerName);
+            }
 
             item.setItemMeta(meta);
         }
@@ -407,16 +425,34 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
         return item;
     }
 
-    public void updatePhysicalBackpacks(Player player, String skinKey) {
+    public void updatePhysicalBackpacks(Player player) {
+        if (player == null || !player.isOnline()) return;
         ItemStack[] contents = player.getInventory().getContents();
         for (int i = 0; i < contents.length; i++) {
             ItemStack item = contents[i];
             if (item != null && isBackpackItem(item)) {
-                ItemStack updated = createBackpackItem(skinKey);
+                ItemMeta meta = item.getItemMeta();
+                String storedId = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "backpack_id"), PersistentDataType.STRING);
+                String storedOwner = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "backpack_owner"), PersistentDataType.STRING);
+                UUID bId = storedId != null ? UUID.fromString(storedId) : player.getUniqueId();
+                
+                BackpackManager.BackpackData data = plugin.getBackpackManager().getBackpack(bId, player.getUniqueId());
+                String activeSkin = data != null ? data.getActiveSkin() : null;
+                if (activeSkin == null || activeSkin.isEmpty()) {
+                    activeSkin = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "backpack_skin"), PersistentDataType.STRING);
+                }
+                if (activeSkin == null) activeSkin = "gray";
+
+                ItemStack updated = createBackpackItem(player, activeSkin, bId, storedOwner);
                 updated.setAmount(item.getAmount());
                 player.getInventory().setItem(i, updated);
             }
         }
+        player.updateInventory();
+    }
+
+    public void updatePhysicalBackpacks(Player player, String skinKey) {
+        updatePhysicalBackpacks(player);
     }
 
     private boolean isBackpackItem(ItemStack item) {

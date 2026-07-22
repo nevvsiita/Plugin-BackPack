@@ -55,8 +55,11 @@ public class BackpackListener implements Listener {
                 event.setCancelled(true);
                 if (event.getHand() == EquipmentSlot.HAND) {
                     Player player = event.getPlayer();
+                    if (plugin.getBackpackOpenManager().isOpening(player)) {
+                        return;
+                    }
                     if (player.hasPermission("backpack.use")) {
-                        plugin.getBackpackGUI().openGUI(player, item, player.getInventory().getHeldItemSlot());
+                        plugin.getBackpackOpenManager().startOpening(player, item, player.getInventory().getHeldItemSlot());
                     } else {
                         player.sendMessage(translateColors(plugin.getConfig().getString("messages.prefix") + 
                                 plugin.getConfig().getString("messages.no-permission")));
@@ -82,8 +85,17 @@ public class BackpackListener implements Listener {
      */
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        Inventory inventory = event.getInventory();
+        if (!(event.getWhoClicked() instanceof Player)) {
+            return;
+        }
         Player player = (Player) event.getWhoClicked();
+        Inventory inventory = event.getInventory();
+        if (plugin.getBackpackOpenManager().isOpening(player)) {
+            event.setCancelled(true);
+            plugin.getBackpackOpenManager().cancelOpening(player);
+            return;
+        }
+
         Inventory clickedInventory = event.getClickedInventory();
         if (clickedInventory == null) {
             return;
@@ -164,20 +176,26 @@ public class BackpackListener implements Listener {
                     event.setCancelled(true);
                     int relative = slot - storageSlots;
                     if (relative == 2) {
-                        // Cambiar visibilidad
-                        boolean newVisibility = !data.isShowDisplay();
-                        data.setShowDisplay(newVisibility);
-                        plugin.getBackpackManager().saveBackpack(player.getUniqueId());
-                        
-                        // Sonido de equipar
-                        playConfigSound(player, "sounds.equip-skin", "ITEM_ARMOR_EQUIP_LEATHER");
-                        
-                        // Refrescar GUI
-                        plugin.getBackpackGUI().openGUI(player, holder.getBackpackItem(), holder.getSlot());
-                        
-                        // Actualizar display
-                        plugin.getBackpackDisplayManager().updateDisplay(player);
+                        // Ordenar inventario de la mochila
+                        sortBackpack(player, data, holder);
                     } else if (relative == 4) {
+                        // Alternar privacidad (Pública / Privada)
+                        UUID bId = holder.getOwnerUUID();
+                        if (player.getUniqueId().equals(bId) || player.hasPermission("backpack.admin")) {
+                            boolean newPrivateState = !data.isPrivate();
+                            data.setPrivate(newPrivateState);
+                            plugin.getBackpackManager().saveBackpack(bId);
+
+                            playConfigSound(player, "sounds.equip-skin", "ITEM_ARMOR_EQUIP_LEATHER");
+                            player.sendMessage(translateColors(plugin.getConfig().getString("messages.prefix") + 
+                                    (newPrivateState ? "&cSeguridad cambiada a PRIVADA. Solo tú puedes abrirla." : "&aSeguridad cambiada a PÚBLICA. Todos pueden abrirla.")));
+
+                            plugin.getBackpackGUI().openGUI(player, holder.getBackpackItem(), holder.getSlot());
+                        } else {
+                            playConfigSound(player, "sounds.unlock-fail", "ENTITY_VILLAGER_NO");
+                            player.sendMessage(translateColors(plugin.getConfig().getString("messages.prefix") + "&cSolo el propietario puede cambiar la seguridad de la mochila."));
+                        }
+                    } else if (relative == 5) {
                         // Abrir el selector de skins
                         plugin.getBackpackGUI().openSkinSelector(player, holder.getBackpackItem(), holder.getSlot());
                     } else if (relative == 6) {
@@ -227,14 +245,16 @@ public class BackpackListener implements Listener {
 
             BackpackGUI.SkinSelectorHolder sh = (BackpackGUI.SkinSelectorHolder) inventory.getHolder();
             int slot = event.getSlot();
-            if (slot == 17) {
+            if (slot == inventory.getSize() - 1 || slot == 17 || slot == 26) {
                 // Botón volver a la mochila principal
                 plugin.getBackpackGUI().openGUI(player, sh.getBackpackItem(), sh.getSlot());
                 return;
             }
 
-            // Encontrar qué skin corresponde según el slot clickeado en la cuadrícula de 18 slots
-            int[] skinSlots = {1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 15};
+            // Encontrar qué skin corresponde según el slot clickeado en la cuadrícula
+            int[] skinSlots = inventory.getSize() > 18
+                    ? new int[]{1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25}
+                    : new int[]{1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 15};
             int skinIdx = -1;
             for (int i = 0; i < skinSlots.length; i++) {
                 if (skinSlots[i] == slot) {
@@ -311,6 +331,9 @@ public class BackpackListener implements Listener {
                                 backpackItem.setItemMeta(itemMeta);
                             }
 
+                            data.setActiveSkin(skinKey);
+                            plugin.getBackpackManager().saveBackpack(uuid);
+
                             // Establecer cooldown
                             int cooldownSecs = plugin.getConfig().getInt("cooldowns.change-skin", 10);
                             if (cooldownSecs > 0) {
@@ -321,8 +344,8 @@ public class BackpackListener implements Listener {
                             player.sendMessage(translateColors(plugin.getConfig().getString("messages.prefix") + 
                                     plugin.getConfig().getString("messages.skin-equipped").replace("%skin_name%", displayName)));
                             
+                            plugin.getBackpackCommand().updatePhysicalBackpacks(player);
                             plugin.getBackpackGUI().openSkinSelector(player, backpackItem, sh.getSlot());
-                            plugin.getBackpackDisplayManager().updateDisplay(player);
                         } else {
                             playConfigSound(player, "sounds.unlock-fail", "ENTITY_VILLAGER_NO");
                             player.sendMessage(translateColors(plugin.getConfig().getString("messages.prefix") + 
@@ -445,7 +468,13 @@ public class BackpackListener implements Listener {
     }
 
     @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        plugin.getBackpackCommand().updatePhysicalBackpacks(event.getPlayer());
+    }
+
+    @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
+        plugin.getBackpackOpenManager().cancelOpening(event.getPlayer());
         plugin.getBackpackDisplayManager().removeDisplay(event.getPlayer());
         plugin.getBackpackManager().unloadBackpack(event.getPlayer().getUniqueId());
     }
@@ -484,7 +513,7 @@ public class BackpackListener implements Listener {
             playConfigSound(player, "sounds.unlock-success", "ENTITY_PLAYER_LEVELUP");
 
             String message = plugin.getConfig().getString("messages.slot-unlocked", "&a¡Has desbloqueado una nueva ranura en tu mochila por &e$%cost%&a!");
-            String prefix = plugin.getConfig().getString("messages.prefix", "&7[&bMochila&7] &r");
+            String prefix = plugin.getConfig().getString("messages.prefix", "&7&lʙᴀᴄᴋᴘᴀᴄᴋ &8» &r");
             String formattedCost = plugin.getVaultHook().hasEconomy() ? String.format("%,.2f", cost) : (int) cost + " niveles de XP";
             
             player.sendMessage(translateColors(prefix + message.replace("%cost%", formattedCost)));
@@ -493,7 +522,7 @@ public class BackpackListener implements Listener {
             playConfigSound(player, "sounds.unlock-fail", "ENTITY_VILLAGER_NO");
 
             String message = plugin.getConfig().getString("messages.no-funds", "&cNo tienes suficiente dinero para desbloquear esta ranura. Necesitas &e$%cost%&c.");
-            String prefix = plugin.getConfig().getString("messages.prefix", "&7[&bMochila&7] &r");
+            String prefix = plugin.getConfig().getString("messages.prefix", "&7&lʙᴀᴄᴋᴘᴀᴄᴋ &8» &r");
             String formattedCost = plugin.getVaultHook().hasEconomy() ? String.format("%,.2f", cost) : ((int) Math.max(1, cost / 100)) + " niveles de XP";
             
             player.sendMessage(translateColors(prefix + message.replace("%cost%", formattedCost)));
@@ -667,11 +696,6 @@ public class BackpackListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        plugin.getBackpackDisplayManager().updateDisplay(event.getPlayer());
-    }
-
-    @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         plugin.getBackpackDisplayManager().updateDisplay(event.getPlayer());
     }
@@ -721,6 +745,11 @@ public class BackpackListener implements Listener {
     @EventHandler
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
+        if (plugin.getBackpackOpenManager().isOpening(player)) {
+            plugin.getBackpackOpenManager().cancelOpening(player);
+            event.setCancelled(true);
+            return;
+        }
         org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
             plugin.getBackpackDisplayManager().updateDisplay(player);
         });
@@ -749,16 +778,111 @@ public class BackpackListener implements Listener {
     @EventHandler
     public void onPlayerItemHeld(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
+        if (plugin.getBackpackOpenManager().isOpening(player)) {
+            if (plugin.getConfig().getBoolean("backpack-opening.cancel-on-item-swap", false)) {
+                plugin.getBackpackOpenManager().cancelOpening(player);
+            }
+        }
         org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
             plugin.getBackpackDisplayManager().updateDisplay(player);
         });
     }
 
     @EventHandler
-    public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
-        Player player = event.getPlayer();
-        org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
-            plugin.getBackpackDisplayManager().updateDisplay(player);
+    public void onEntityDamage(org.bukkit.event.entity.EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if (plugin.getBackpackOpenManager().isOpening(player)) {
+                if (plugin.getConfig().getBoolean("backpack-opening.cancel-on-damage", false)) {
+                    plugin.getBackpackOpenManager().cancelOpening(player);
+                }
+            }
+        }
+    }
+
+    private void sortBackpack(Player player, BackpackManager.BackpackData data, BackpackGUI.BackpackHolder holder) {
+        Inventory inv = player.getOpenInventory().getTopInventory();
+        if (inv == null || !(inv.getHolder() instanceof BackpackGUI.BackpackHolder)) {
+            return;
+        }
+
+        int unlockedRows = data.getUnlockedSlots();
+        int storageSlots = unlockedRows * 9;
+
+        List<ItemStack> itemsToSort = new ArrayList<>();
+
+        // 1. Recoger todos los items de almacenamiento
+        for (int i = 0; i < storageSlots; i++) {
+            ItemStack item = inv.getItem(i);
+            if (item != null && item.getType() != Material.AIR && !BackpackGUI.isControlItem(item, plugin)) {
+                itemsToSort.add(item.clone());
+            }
+        }
+
+        if (itemsToSort.isEmpty()) {
+            player.sendMessage(translateColors(plugin.getConfig().getString("messages.prefix") + "&cNo hay ítems para ordenar en la mochila."));
+            try {
+                player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+            } catch (Exception ignored) {}
+            return;
+        }
+
+        // 2. Agrupar ítems apilables
+        List<ItemStack> mergedItems = new ArrayList<>();
+        for (ItemStack item : itemsToSort) {
+            boolean merged = false;
+            for (ItemStack existing : mergedItems) {
+                if (existing.isSimilar(item)) {
+                    int maxStack = existing.getMaxStackSize();
+                    int spaceLeft = maxStack - existing.getAmount();
+                    if (spaceLeft > 0) {
+                        int addAmount = Math.min(spaceLeft, item.getAmount());
+                        existing.setAmount(existing.getAmount() + addAmount);
+                        item.setAmount(item.getAmount() - addAmount);
+                        if (item.getAmount() <= 0) {
+                            merged = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!merged && item.getAmount() > 0) {
+                mergedItems.add(item);
+            }
+        }
+
+        // 3. Ordenar alfabéticamente por nombre de material (y luego por display name si tiene)
+        mergedItems.sort((a, b) -> {
+            String nameA = a.getType().name();
+            String nameB = b.getType().name();
+            if (a.hasItemMeta() && a.getItemMeta().hasDisplayName()) {
+                nameA = a.getItemMeta().getDisplayName();
+            }
+            if (b.hasItemMeta() && b.getItemMeta().hasDisplayName()) {
+                nameB = b.getItemMeta().getDisplayName();
+            }
+            int comp = nameA.compareToIgnoreCase(nameB);
+            if (comp != 0) return comp;
+            return Integer.compare(b.getAmount(), a.getAmount());
         });
+
+        // 4. Limpiar los slots de almacenamiento en el GUI
+        for (int i = 0; i < storageSlots; i++) {
+            inv.setItem(i, null);
+        }
+
+        // 5. Colocar los ítems ordenados en el GUI y actualizar la data de la mochila
+        data.clearPageItems(1);
+        for (int i = 0; i < mergedItems.size() && i < storageSlots; i++) {
+            ItemStack sortedItem = mergedItems.get(i);
+            inv.setItem(i, sortedItem);
+            data.setItem(1, i, sortedItem);
+        }
+
+        // 6. Guardar datos de la mochila y reproducir sonido de éxito
+        UUID bId = holder.getOwnerUUID();
+        plugin.getBackpackManager().saveBackpack(bId);
+        playConfigSound(player, "sounds.equip-skin", "ITEM_ARMOR_EQUIP_LEATHER");
+        player.sendMessage(translateColors(plugin.getConfig().getString("messages.prefix") + "<#A9FFA7>¡Mochila ordenada con éxito!"));
     }
 }

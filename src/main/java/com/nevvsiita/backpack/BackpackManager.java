@@ -32,18 +32,28 @@ public class BackpackManager {
      * Obtiene los datos de la mochila de un jugador, cargándolos si no están en caché.
      */
     public BackpackData getBackpack(UUID uuid) {
-        if (cache.containsKey(uuid)) {
-            return cache.get(uuid);
+        return getBackpack(uuid, null);
+    }
+
+    public BackpackData getBackpack(UUID backpackId, UUID ownerIdFallback) {
+        if (cache.containsKey(backpackId)) {
+            return cache.get(backpackId);
         }
-        return loadBackpack(uuid);
+        return loadBackpack(backpackId, ownerIdFallback);
     }
 
     /**
-     * Carga la mochila de un jugador desde su archivo de datos.
+     * Carga la mochila desde su archivo de datos.
      */
-    private BackpackData loadBackpack(UUID uuid) {
-        File file = new File(dataFolder, uuid.toString() + ".yml");
-        BackpackData data = new BackpackData(uuid);
+    private BackpackData loadBackpack(UUID backpackId, UUID ownerIdFallback) {
+        File file = new File(dataFolder, backpackId.toString() + ".yml");
+        if (!file.exists() && ownerIdFallback != null) {
+            File legacyFile = new File(dataFolder, ownerIdFallback.toString() + ".yml");
+            if (legacyFile.exists()) {
+                legacyFile.renameTo(file);
+            }
+        }
+        BackpackData data = new BackpackData(backpackId);
 
         if (file.exists()) {
             FileConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -64,9 +74,12 @@ public class BackpackManager {
             }
             data.setUnlockedSkins(unlockedSkins);
 
-            // Visibilidad
+            // Visibilidad y privacidad
             boolean showDisplay = config.getBoolean("show-display", true);
             data.setShowDisplay(showDisplay);
+
+            boolean isPrivate = config.getBoolean("is-private", false);
+            data.setPrivate(isPrivate);
 
             // Cargar ítems guardados por páginas
             ConfigurationSection itemsSection = config.getConfigurationSection("items");
@@ -110,7 +123,7 @@ public class BackpackManager {
             data.setUnlockedSkins(defSkins);
         }
         
-        cache.put(uuid, data);
+        cache.put(backpackId, data);
         return data;
     }
 
@@ -130,6 +143,7 @@ public class BackpackManager {
         config.set("active-skin", data.getActiveSkin());
         config.set("unlocked-skins", data.getUnlockedSkins());
         config.set("show-display", data.isShowDisplay());
+        config.set("is-private", data.isPrivate());
         
         // Limpiamos la sección anterior de ítems
         config.set("items", null);
@@ -180,6 +194,7 @@ public class BackpackManager {
         private List<String> unlockedSkins = new ArrayList<>();
         private final Map<Integer, Map<Integer, ItemStack>> itemsByPage = new HashMap<>();
         private boolean showDisplay = true;
+        private boolean isPrivate = false;
 
         public BackpackData(UUID playerUUID) {
             this.playerUUID = playerUUID;
@@ -187,6 +202,14 @@ public class BackpackManager {
 
         public UUID getPlayerUUID() {
             return playerUUID;
+        }
+
+        public boolean isPrivate() {
+            return isPrivate;
+        }
+
+        public void setPrivate(boolean isPrivate) {
+            this.isPrivate = isPrivate;
         }
 
         public int getUnlockedSlots() {
@@ -249,6 +272,10 @@ public class BackpackManager {
 
         public void clearPage(int page) {
             getItems(page).clear();
+        }
+
+        public void clearPageItems(int page) {
+            clearPage(page);
         }
 
         public void clearAll() {

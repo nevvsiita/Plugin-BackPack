@@ -12,6 +12,7 @@ public class BackPackPlugin extends JavaPlugin {
     private BackpackCommand backpackCommand;
     private LocationsManager locationsManager;
     private BackpackDisplayManager backpackDisplayManager;
+    private BackpackOpenManager backpackOpenManager;
 
     @Override
     public void onEnable() {
@@ -37,7 +38,10 @@ public class BackPackPlugin extends JavaPlugin {
         this.backpackCommand = new BackpackCommand(this);
         this.locationsManager = new LocationsManager(this);
         this.backpackDisplayManager = new BackpackDisplayManager(this);
-        this.backpackDisplayManager.startTask();
+        if (getConfig().getBoolean("backpack-display.enabled", false)) {
+            this.backpackDisplayManager.startTask();
+        }
+        this.backpackOpenManager = new BackpackOpenManager(this);
 
         // Registrar eventos
         getServer().getPluginManager().registerEvents(new BackpackListener(this), this);
@@ -97,6 +101,9 @@ public class BackPackPlugin extends JavaPlugin {
         if (backpackDisplayManager != null) {
             backpackDisplayManager.cleanAll();
         }
+        if (backpackOpenManager != null) {
+            backpackOpenManager.cancelAll();
+        }
         // Guardar todos los datos activos de las mochilas en disco antes de apagar/recargar el servidor
         if (backpackManager != null) {
             backpackManager.saveAll();
@@ -135,5 +142,9 @@ public class BackPackPlugin extends JavaPlugin {
 
     public BackpackDisplayManager getBackpackDisplayManager() {
         return backpackDisplayManager;
+    }
+
+    public BackpackOpenManager getBackpackOpenManager() {
+        return backpackOpenManager;
     }
 }

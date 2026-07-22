@@ -31,6 +31,19 @@ public class BackpackGUI {
         this.plugin = plugin;
     }
 
+    public static String getSkinGradient(BackPackPlugin plugin, String skinKey) {
+        if (plugin == null || skinKey == null) return "<gradient:#A6C1EE:#B8FFC8>";
+        String name = plugin.getConfig().getString("backpack-skins." + skinKey + ".name");
+        if (name != null && name.contains("<gradient:")) {
+            int start = name.indexOf("<gradient:");
+            int end = name.indexOf(">", start);
+            if (end != -1) {
+                return name.substring(start, end + 1);
+            }
+        }
+        return "<gradient:#A6C1EE:#B8FFC8>";
+    }
+
     /**
      * Mapea un índice de almacenamiento (0-24) a su ranura en el GUI (tamaño 36).
      * En la fila 3 (slots 18-26), centramos las 7 ranuras de almacenamiento
@@ -181,6 +194,7 @@ public class BackpackGUI {
             meta.setLore(lore);
             head.setItemMeta(meta);
         }
+        markControlItem(head);
         return head;
     }
 
@@ -188,8 +202,11 @@ public class BackpackGUI {
      * Abre el inventario de la mochila desde un item físico específico.
      */
     public void openGUI(Player player, ItemStack backpackItem, int slot) {
-        UUID uuid = player.getUniqueId();
-        BackpackManager.BackpackData data = plugin.getBackpackManager().getBackpack(uuid);
+        String storedId = (backpackItem != null && backpackItem.hasItemMeta()) ? 
+                backpackItem.getItemMeta().getPersistentDataContainer().get(new org.bukkit.NamespacedKey(plugin, "backpack_id"), org.bukkit.persistence.PersistentDataType.STRING) : null;
+        UUID backpackId = storedId != null ? UUID.fromString(storedId) : player.getUniqueId();
+
+        BackpackManager.BackpackData data = plugin.getBackpackManager().getBackpack(backpackId, player.getUniqueId());
         FileConfiguration config = plugin.getConfig();
 
         int unlockedRows = data.getUnlockedSlots(); // 1 a 5
@@ -198,11 +215,28 @@ public class BackpackGUI {
 
         int size = (unlockedRows + 1) * 9; // e.g. 18, 27, 36, 45, 54
 
-        String title = config.getString("gui.title", "<gradient:#a18cd1:#fa97c4>&lᴍᴏᴄʜɪʟᴀ</gradient> %player%");
-        title = title.replace("%player%", player.getName());
+        String storedOwner = null;
+        if (backpackItem != null && backpackItem.hasItemMeta()) {
+            ItemMeta meta = backpackItem.getItemMeta();
+            org.bukkit.NamespacedKey ownerKey = new org.bukkit.NamespacedKey(plugin, "backpack_owner");
+            if (meta.getPersistentDataContainer().has(ownerKey, org.bukkit.persistence.PersistentDataType.STRING)) {
+                storedOwner = meta.getPersistentDataContainer().get(ownerKey, org.bukkit.persistence.PersistentDataType.STRING);
+            }
+        }
+        if (storedOwner == null || storedOwner.isEmpty()) {
+            org.bukkit.OfflinePlayer offlineOwner = Bukkit.getOfflinePlayer(backpackId);
+            if (offlineOwner != null && offlineOwner.getName() != null) {
+                storedOwner = offlineOwner.getName();
+            } else {
+                storedOwner = player.getName();
+            }
+        }
+
+        String title = config.getString("gui.title", "&8&lʙᴀᴄᴋᴘᴀᴄᴋ &r&7%player%");
+        title = title.replace("%player%", storedOwner);
         title = translateColors(title);
 
-        BackpackHolder holder = new BackpackHolder(uuid, 1, backpackItem, slot);
+        BackpackHolder holder = new BackpackHolder(backpackId, 1, backpackItem, slot);
         Inventory inventory = Bukkit.createInventory(holder, size, title);
 
         int storageSlots = unlockedRows * 9;
@@ -215,13 +249,15 @@ public class BackpackGUI {
             }
         }
 
-        // Llenar la última fila con el botón de visibilidad, el botón del selector de color, el botón de mejoras y separadores
+        // Llenar la última fila con el botón de ordenar, el botón del selector de color, el botón de mejoras y separadores
         int controlStart = storageSlots;
         for (int i = controlStart; i < size; i++) {
             int relative = i - controlStart;
             if (relative == 2) {
-                inventory.setItem(i, createVisibilityButton(data.isShowDisplay()));
+                inventory.setItem(i, createSortButton());
             } else if (relative == 4) {
+                inventory.setItem(i, createPrivacyButton(data.isPrivate()));
+            } else if (relative == 5) {
                 inventory.setItem(i, createColorButton());
             } else if (relative == 6) {
                 inventory.setItem(i, createUpgradeButton(unlockedRows));
@@ -288,8 +324,10 @@ public class BackpackGUI {
         for (int i = controlStart; i < size; i++) {
             int relative = i - controlStart;
             if (relative == 2) {
-                inventory.setItem(i, createVisibilityButton(data.isShowDisplay()));
+                inventory.setItem(i, createSortButton());
             } else if (relative == 4) {
+                inventory.setItem(i, createPrivacyButton(data.isPrivate()));
+            } else if (relative == 5) {
                 inventory.setItem(i, createColorButton());
             } else if (relative == 6) {
                 inventory.setItem(i, createUpgradeButton(unlockedRows));
@@ -311,17 +349,21 @@ public class BackpackGUI {
 
         SkinSelectorHolder holder = new SkinSelectorHolder(backpackItem, slot);
         String selectorTitle = config.getString("skin-selector-gui.title", "&8&lsᴇʟᴇᴄᴛᴏʀ ᴅᴇ ᴀsᴘᴇᴄᴛᴏ");
-        Inventory selector = Bukkit.createInventory(holder, 18, translateColors(selectorTitle));
+        
+        ConfigurationSection skinsSection = config.getConfigurationSection("backpack-skins");
+        int totalSkins = skinsSection != null ? skinsSection.getKeys(false).size() : 0;
+        int invSize = totalSkins > 12 ? 27 : 18;
+        Inventory selector = Bukkit.createInventory(holder, invSize, translateColors(selectorTitle));
 
         // Rellenar primero todo con paneles grises de fondo
-        for (int i = 0; i < 18; i++) {
+        for (int i = 0; i < invSize; i++) {
             selector.setItem(i, createSeparatorItem());
         }
 
-        // Mapeo simétrico para las 12 skins en un inventario de 18 slots
-        int[] skinSlots = {1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 15};
-
-        ConfigurationSection skinsSection = config.getConfigurationSection("backpack-skins");
+        // Mapeo simétrico para las skins
+        int[] skinSlots = invSize > 18
+                ? new int[]{1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25}
+                : new int[]{1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 15};
         if (skinsSection != null) {
             int index = 0;
             for (String key : skinsSection.getKeys(false)) {
@@ -410,7 +452,7 @@ public class BackpackGUI {
             backMeta.setLore(coloredBackLore);
             backButton.setItemMeta(backMeta);
         }
-        selector.setItem(17, backButton);
+        selector.setItem(invSize - 1, backButton);
 
         player.openInventory(selector);
     }
@@ -435,6 +477,7 @@ public class BackpackGUI {
             meta.setDisplayName(translateColors("&8"));
             item.setItemMeta(meta);
         }
+        markControlItem(item);
         return item;
     }
 
@@ -458,6 +501,7 @@ public class BackpackGUI {
             meta.setLore(coloredLore);
             item.setItemMeta(meta);
         }
+        markControlItem(item);
         return item;
     }
 
@@ -483,6 +527,44 @@ public class BackpackGUI {
             meta.setLore(coloredLore);
             item.setItemMeta(meta);
         }
+        markControlItem(item);
+        return item;
+    }
+
+    private ItemStack createPrivacyButton(boolean isPrivate) {
+        FileConfiguration config = plugin.getConfig();
+        String path = isPrivate ? "privacy-button.private" : "privacy-button.public";
+        String materialName = config.getString(path + ".material", "PLAYER_HEAD");
+        
+        ItemStack item = null;
+        if (materialName.equalsIgnoreCase("PLAYER_HEAD") && config.contains(path + ".hdb-id")) {
+            String hdbId = config.getString(path + ".hdb-id");
+            if (plugin.getHdbHook() != null) {
+                item = plugin.getHdbHook().getHead(hdbId);
+            }
+        }
+        if (item == null) {
+            Material mat = Material.matchMaterial(materialName);
+            if (mat == null) {
+                mat = isPrivate ? Material.IRON_DOOR : Material.OAK_DOOR;
+            }
+            item = new ItemStack(mat);
+        }
+
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            String name = config.getString(path + ".name", isPrivate ? "&cSeguridad: &lPRIVADA" : "&aSeguridad: &lPÚBLICA");
+            meta.setDisplayName(translateColors(name));
+
+            List<String> lore = config.getStringList(path + ".lore");
+            List<String> coloredLore = new ArrayList<>();
+            for (String line : lore) {
+                coloredLore.add(translateColors(line));
+            }
+            meta.setLore(coloredLore);
+            item.setItemMeta(meta);
+        }
+        markControlItem(item);
         return item;
     }
 
@@ -520,17 +602,32 @@ public class BackpackGUI {
             meta.setLore(coloredLore);
             item.setItemMeta(meta);
         }
+        markControlItem(item);
         return item;
     }
 
-    private ItemStack createVisibilityButton(boolean show) {
+    public void markControlItem(ItemStack item) {
+        if (item != null && item.hasItemMeta()) {
+            ItemMeta meta = item.getItemMeta();
+            meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "gui_control_item"), PersistentDataType.BYTE, (byte) 1);
+            item.setItemMeta(meta);
+        }
+    }
+
+    public static boolean isControlItem(ItemStack item, BackPackPlugin plugin) {
+        if (item == null || !item.hasItemMeta()) return false;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return false;
+        return meta.getPersistentDataContainer().has(new NamespacedKey(plugin, "gui_control_item"), PersistentDataType.BYTE);
+    }
+
+    private ItemStack createSortButton() {
         FileConfiguration config = plugin.getConfig();
-        String path = show ? "gui.visibility-button.show" : "gui.visibility-button.hide";
-        String materialName = config.getString(path + ".material", "PLAYER_HEAD");
+        String materialName = config.getString("sort-button.material", "HOPPER");
         
         ItemStack item;
-        if (materialName.equalsIgnoreCase("PLAYER_HEAD") && config.contains(path + ".hdb-id")) {
-            String hdbId = config.getString(path + ".hdb-id");
+        if (materialName.equalsIgnoreCase("PLAYER_HEAD") && config.contains("sort-button.hdb-id")) {
+            String hdbId = config.getString("sort-button.hdb-id");
             ItemStack head = null;
             if (plugin.getHdbHook() != null) {
                 head = plugin.getHdbHook().getHead(hdbId);
@@ -538,22 +635,22 @@ public class BackpackGUI {
             if (head != null) {
                 item = head;
             } else {
-                item = new ItemStack(Material.PLAYER_HEAD);
+                item = new ItemStack(Material.HOPPER);
             }
         } else {
             Material mat = Material.matchMaterial(materialName);
             if (mat == null) {
-                mat = Material.PLAYER_HEAD;
+                mat = Material.HOPPER;
             }
             item = new ItemStack(mat);
         }
 
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            String name = config.getString(path + ".name", show ? "&aVisualización: &lMOSTRAR" : "&cVisualización: &lOCULTAR");
+            String name = config.getString("sort-button.name", "<gradient:#A6C1EE:#B8FFC8>&lᴏʀᴅᴇɴᴀʀ ɪɴᴠᴇɴᴛᴀʀɪᴏ</gradient>");
             meta.setDisplayName(translateColors(name));
 
-            List<String> lore = config.getStringList(path + ".lore");
+            List<String> lore = config.getStringList("sort-button.lore");
             List<String> coloredLore = new ArrayList<>();
             for (String line : lore) {
                 coloredLore.add(translateColors(line));
@@ -561,6 +658,7 @@ public class BackpackGUI {
             meta.setLore(coloredLore);
             item.setItemMeta(meta);
         }
+        markControlItem(item);
         return item;
     }
 
@@ -587,6 +685,7 @@ public class BackpackGUI {
             meta.setLore(coloredLore);
             item.setItemMeta(meta);
         }
+        markControlItem(item);
         return item;
     }
 
@@ -612,6 +711,7 @@ public class BackpackGUI {
             meta.setLore(coloredLore);
             item.setItemMeta(meta);
         }
+        markControlItem(item);
         return item;
     }
 
