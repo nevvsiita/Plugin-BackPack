@@ -4,8 +4,8 @@
 
 # Ajustes de la interfaz de la mochila
 gui:
-  # Título del inventario (Mochila con degradado gris en negrita)
-  title: "&8&lʙᴀᴄᴋᴘᴀᴄᴋ &r&7%player%"
+  # Título del inventario (Mochila con identificador de propietario)
+  title: "&8&lʙᴀᴄᴋᴘᴀᴄᴋ &8» &7Propietario: &e%player%"
   # Tamaño del inventario. FIJADO EN 36 para diseño de 4 filas.
   # (25 ranuras de almacenamiento en diseño centrado, botones de control simétricos)
   size: 36
@@ -35,12 +35,13 @@ gui:
 # Ajustes de la animación de carga al abrir la mochila
 backpack-opening:
   enabled: true
-  delay: 1.5
-  update-interval: 3
+  delay: 3.0
+  update-interval: 20
   cancel-on-move: false
   cancel-on-damage: false
   cancel-on-item-swap: false
   messages:
+    opening: "&7&lʙᴀᴄᴋᴘᴀᴄᴋ &8» &7Abriendo..."
     already-opening: "&7&lʙᴀᴄᴋᴘᴀᴄᴋ &8» &c¡Tu backpack ya se está abriendo!"
     cancelled: "&7&lʙᴀᴄᴋᴘᴀᴄᴋ &8» &cLa apertura ha sido interrumpida."
     progress: "&7&lʙᴀᴄᴋᴘᴀᴄᴋ &8» &r%bar% &7%percent%%"
@@ -52,7 +53,7 @@ backpack-opening:
     enabled: true
     name: "BLOCK_NOTE_BLOCK_PLING"
     pitch-start: 0.5
-    pitch-end: 1.5
+    pitch-end: 1.6
 
 # Ajustes de cooldowns del plugin (en segundos)
 cooldowns:
@@ -270,6 +271,19 @@ messages:
   loc-removed: "&cUbicación de desbloqueo eliminada para %skin_name%."
   cooldown-skin: "&cDebes esperar %time% segundos antes de volver a cambiar tu aspecto."
 
+# Configuración del ítem físico de la mochila en el inventario
+backpack-item:
+  name: "%skin_name%"
+  lore:
+    - "&8&m---------------------------------"
+    - " &7Un resistente equipo de viaje preparado"
+    - " &7para guardar tus pertenencias en tus aventuras."
+    - ""
+    - " &7Propietario: &e%owner%"
+    - "<#FF8F8F>&l→ <#FFA898>&lᴄ<#FFB09C>&lʟ<#FFC0A2>&lɪ<#FFD0A9>&lᴄ<#FFE0AF>&lᴋ <#FFE2A8>&lᴅ<#FFE599>&lᴇ<#FFE691>&lʀ<#F0EB96>&lᴇ<#E9EE98>&lᴄ<#E1F19A>&lʜ<#D0F69E>&lᴏ <#9BFFD2>&lᴘ<#98FFDD>&lᴀ<#94FFE7>&lʀ<#8DFFFA>&lᴀ <#87DCFE>&lᴀ<#86D4FE>&lʙ<#84CBFE>&lʀ<#81B9FF>&lɪ&lʀ"
+  
+    - "&8&m---------------------------------"
+
 # Sonidades de la interfaz al comprar/interactuar
 sounds:
   unlock-success: "ENTITY_PLAYER_LEVELUP"
@@ -287,7 +301,7 @@ items:
     lore:
       - "&8&m---------------------------------"
       - " &7¡ᴇsᴛᴀ ʀᴀɴᴜʀᴀ ᴇsᴛᴀ ʙʟᴏQᴜᴇᴀᴅᴀ!"
-      - " &7ᴄᴏsᴛᴏ ᴘᴀʀᴀ ᴅᴇsʙbʟᴏQᴜᴇᴀʀ: &a$%cost%"
+      - " &7ᴄᴏsᴛᴏ ᴘᴀʀᴀ ᴅᴇsʙbʟᴏQᴜᴇᴀʀ: &a$%cost%"   
       - ""
       - " &e&l→ ʜᴀᴢ ᴄʟɪᴄ ᴘᴀʀᴀ ᴅᴇsʙbʟᴏQᴜᴇᴀʀ"
       - "&8&m---------------------------------"

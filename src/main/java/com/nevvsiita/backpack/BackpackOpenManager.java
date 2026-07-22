@@ -65,7 +65,6 @@ public class BackpackOpenManager {
             return;
         }
 
-        // Obtener la skin del ítem
         String activeSkin = "gray";
         if (backpackItem != null && backpackItem.hasItemMeta()) {
             org.bukkit.inventory.meta.ItemMeta meta = backpackItem.getItemMeta();
@@ -76,14 +75,22 @@ public class BackpackOpenManager {
             }
         }
 
-        double delaySecs = config.getDouble("backpack-opening.delay", 1.5);
-        int updateInterval = config.getInt("backpack-opening.update-interval", 3); // Ticks
-        int totalTicks = (int) (delaySecs * 20);
-        int totalSteps = Math.max(1, totalTicks / updateInterval);
+        // Mensaje inicial "Abriendo..." at t = 0s
+        String openingMsg = config.getString("backpack-opening.messages.opening", "&7&lʙᴀᴄᴋᴘᴀᴄᴋ &8» &7Abriendo...");
+        player.sendMessage(translateColors(openingMsg));
 
-        OpeningTask task = new OpeningTask(player, backpackItem, slot, totalSteps, updateInterval, activeSkin);
+        boolean soundsEnabled = config.getBoolean("backpack-opening.sound.enabled", true);
+        String soundName = config.getString("backpack-opening.sound.name", "BLOCK_NOTE_BLOCK_PLING");
+        if (soundsEnabled) {
+            try {
+                player.playSound(player.getLocation(), org.bukkit.Sound.valueOf(soundName), 0.7f, 0.5f);
+            } catch (IllegalArgumentException ignored) {}
+        }
+
+        OpeningTask task = new OpeningTask(player, backpackItem, slot, activeSkin);
         activeTasks.put(uuid, task);
-        task.runTaskTimer(plugin, 0L, (long) updateInterval);
+        // Ejecutar cada 20 ticks (1 segundo) empezando tras 20 ticks (1s)
+        task.runTaskTimer(plugin, 20L, 20L);
     }
 
     public void cancelOpening(Player player) {
@@ -126,17 +133,13 @@ public class BackpackOpenManager {
         private final Player player;
         private final ItemStack backpackItem;
         private final int slot;
-        private final int totalSteps;
-        private final int updateInterval;
         private final String skinKey;
-        private int currentStep = 0;
+        private int currentStep = 0; // 0 = 0%, 1 = 50%, 2 = 100%
 
-        public OpeningTask(Player player, ItemStack backpackItem, int slot, int totalSteps, int updateInterval, String skinKey) {
+        public OpeningTask(Player player, ItemStack backpackItem, int slot, String skinKey) {
             this.player = player;
             this.backpackItem = backpackItem;
             this.slot = slot;
-            this.totalSteps = totalSteps;
-            this.updateInterval = updateInterval;
             this.skinKey = skinKey;
         }
 
@@ -148,22 +151,22 @@ public class BackpackOpenManager {
                 return;
             }
 
-            if (currentStep >= totalSteps) {
-                activeTasks.remove(player.getUniqueId());
-                cancel();
-                // Abrir la mochila al completar la barra
-                plugin.getBackpackGUI().openGUI(player, backpackItem, slot);
-                return;
-            }
-
             FileConfiguration config = plugin.getConfig();
 
-            // Dibujar la barra de progreso original con ● y ○
+            double percent;
+            if (currentStep == 0) {
+                percent = 0.0;
+            } else if (currentStep == 1) {
+                percent = 0.5;
+            } else {
+                percent = 1.0;
+            }
+
+            // Dibujar la barra de progreso con ● y ○
             int barLength = config.getInt("backpack-opening.bar.length", 10);
             String charFilled = config.getString("backpack-opening.bar.char-filled", "●");
             String charEmpty = config.getString("backpack-opening.bar.char-empty", "○");
 
-            double percent = (double) (currentStep + 1) / totalSteps;
             int filledChars = (int) Math.round(percent * barLength);
             int emptyChars = Math.max(0, barLength - filledChars);
 
@@ -191,9 +194,9 @@ public class BackpackOpenManager {
             // Sonidos progresivos de apertura
             boolean soundsEnabled = config.getBoolean("backpack-opening.sound.enabled", true);
             if (soundsEnabled) {
-                String soundName = config.getString("backpack-opening.sound.name", "BLOCK_NOTE_BLOCK_CHIME");
-                float startPitch = (float) config.getDouble("backpack-opening.sound.pitch-start", 0.8);
-                float endPitch = (float) config.getDouble("backpack-opening.sound.pitch-end", 1.8);
+                String soundName = config.getString("backpack-opening.sound.name", "BLOCK_NOTE_BLOCK_PLING");
+                float startPitch = (float) config.getDouble("backpack-opening.sound.pitch-start", 0.5);
+                float endPitch = (float) config.getDouble("backpack-opening.sound.pitch-end", 1.6);
                 float currentPitch = startPitch + (float) (percent * (endPitch - startPitch));
 
                 try {
@@ -201,7 +204,14 @@ public class BackpackOpenManager {
                 } catch (IllegalArgumentException ignored) {}
             }
 
-            currentStep++;
+            if (currentStep >= 2) {
+                activeTasks.remove(player.getUniqueId());
+                cancel();
+                // Abrir la mochila al completar 100%
+                plugin.getBackpackGUI().openGUI(player, backpackItem, slot);
+            } else {
+                currentStep++;
+            }
         }
     }
 }

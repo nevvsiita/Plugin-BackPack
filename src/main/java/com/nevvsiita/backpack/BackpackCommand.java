@@ -72,10 +72,10 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
 
             // Obtener la skin activa del jugador objetivo
             String activeSkin = plugin.getBackpackManager().getBackpack(target.getUniqueId()).getActiveSkin();
-            ItemStack backpackItem = createBackpackItem(activeSkin);
+            ItemStack backpackItem = createBackpackItem(target, activeSkin, target.getUniqueId(), target.getName());
             target.getInventory().addItem(backpackItem);
             plugin.getBackpackDisplayManager().updateDisplay(target);
-            
+
             String givenMsg = getMsg("messages.item-given").replace("%player%", target.getName());
             sender.sendMessage(prefix + givenMsg);
             return true;
@@ -121,11 +121,12 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
 
-                 plugin.getLocationsManager().addLocation(looking, skinKey);
-                
+                plugin.getLocationsManager().addLocation(looking, skinKey);
+
                 String skinDisplayName = skinsSection.getString(skinKey + ".name", skinKey);
                 String rawMsg = plugin.getConfig().getString("messages.loc-added");
-                player.sendMessage(BackpackGUI.translateColors(prefix + rawMsg.replace("%skin_name%", skinDisplayName)));
+                player.sendMessage(
+                        BackpackGUI.translateColors(prefix + rawMsg.replace("%skin_name%", skinDisplayName)));
                 return true;
             }
 
@@ -148,10 +149,12 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                     String skinDisplayName = removedLoc.getSkinKey();
                     ConfigurationSection skinsSection = plugin.getConfig().getConfigurationSection("backpack-skins");
                     if (skinsSection != null) {
-                        skinDisplayName = skinsSection.getString(removedLoc.getSkinKey() + ".name", removedLoc.getSkinKey());
+                        skinDisplayName = skinsSection.getString(removedLoc.getSkinKey() + ".name",
+                                removedLoc.getSkinKey());
                     }
                     String rawMsg = plugin.getConfig().getString("messages.loc-removed");
-                    player.sendMessage(BackpackGUI.translateColors(prefix + rawMsg.replace("%skin_name%", skinDisplayName)));
+                    player.sendMessage(
+                            BackpackGUI.translateColors(prefix + rawMsg.replace("%skin_name%", skinDisplayName)));
                 } else {
                     player.sendMessage(prefix + getMsg("messages.no-loc-here"));
                 }
@@ -162,7 +165,7 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
             if (action.equalsIgnoreCase("reload")) {
                 plugin.reloadConfig();
                 plugin.getLocationsManager().loadLocations();
-                
+
                 // Actualizar las mochilas físicas de todos los jugadores online en caliente
                 for (Player online : Bukkit.getOnlinePlayers()) {
                     BackpackManager.BackpackData data = plugin.getBackpackManager().getBackpack(online.getUniqueId());
@@ -170,8 +173,9 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                         updatePhysicalBackpacks(online, data.getActiveSkin());
                     }
                 }
-                
-                sender.sendMessage(prefix + BackpackGUI.translateColors("&a¡La configuración del plugin, las ubicaciones y las mochilas han sido recargadas en caliente!"));
+
+                sender.sendMessage(prefix + BackpackGUI.translateColors(
+                        "&a¡La configuración del plugin, las ubicaciones y las mochilas han sido recargadas en caliente!"));
                 return true;
             }
 
@@ -196,8 +200,8 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                         .replace("%slots%", String.valueOf(data.getUnlockedSlots()));
                 sender.sendMessage(prefix + msg);
                 return true;
-            } 
-            
+            }
+
             if (action.equalsIgnoreCase("inspect")) {
                 if (!(sender instanceof Player)) {
                     sender.sendMessage(prefix + getMsg("messages.only-players"));
@@ -206,7 +210,8 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
 
                 Player admin = (Player) sender;
                 plugin.getBackpackGUI().openGUIForAdmin(admin, targetUUID);
-                sender.sendMessage(prefix + BackpackGUI.translateColors("&aAbriendo la mochila de &e" + target.getName() + "&a."));
+                sender.sendMessage(
+                        prefix + BackpackGUI.translateColors("&aAbriendo la mochila de &e" + target.getName() + "&a."));
                 return true;
             }
 
@@ -218,14 +223,17 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
 
                 try {
                     int amount = Integer.parseInt(args[3]);
-                    if (amount < 1) amount = 1;
+                    if (amount < 1)
+                        amount = 1;
 
                     data.setUnlockedSlots(amount);
                     plugin.getBackpackManager().saveBackpack(targetUUID);
 
                     // Refrescar GUI si tiene la mochila abierta en su página actual
-                    if (target.getOpenInventory() != null && target.getOpenInventory().getTopInventory().getHolder() instanceof BackpackGUI.BackpackHolder) {
-                        BackpackGUI.BackpackHolder h = (BackpackGUI.BackpackHolder) target.getOpenInventory().getTopInventory().getHolder();
+                    if (target.getOpenInventory() != null && target.getOpenInventory().getTopInventory()
+                            .getHolder() instanceof BackpackGUI.BackpackHolder) {
+                        BackpackGUI.BackpackHolder h = (BackpackGUI.BackpackHolder) target.getOpenInventory()
+                                .getTopInventory().getHolder();
                         plugin.getBackpackGUI().openGUI(target, h.getBackpackItem(), h.getSlot());
                     }
 
@@ -244,12 +252,15 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                 plugin.getBackpackManager().saveBackpack(targetUUID);
 
                 // Refrescar GUI si tiene la mochila abierta
-                if (target.getOpenInventory() != null && target.getOpenInventory().getTopInventory().getHolder() instanceof BackpackGUI.BackpackHolder) {
-                    BackpackGUI.BackpackHolder h = (BackpackGUI.BackpackHolder) target.getOpenInventory().getTopInventory().getHolder();
+                if (target.getOpenInventory() != null && target.getOpenInventory().getTopInventory()
+                        .getHolder() instanceof BackpackGUI.BackpackHolder) {
+                    BackpackGUI.BackpackHolder h = (BackpackGUI.BackpackHolder) target.getOpenInventory()
+                            .getTopInventory().getHolder();
                     plugin.getBackpackGUI().openGUI(target, h.getBackpackItem(), h.getSlot());
                 }
 
-                sender.sendMessage(prefix + BackpackGUI.translateColors("&aHas restablecido las ranuras de &e" + target.getName() + " &aal valor por defecto (Nivel 1)."));
+                sender.sendMessage(prefix + BackpackGUI.translateColors("&aHas restablecido las ranuras de &e"
+                        + target.getName() + " &aal valor por defecto (Nivel 1)."));
                 return true;
             }
 
@@ -262,13 +273,16 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                 updatePhysicalBackpacks(target, "gray");
                 plugin.getBackpackDisplayManager().updateDisplay(target);
 
-                sender.sendMessage(prefix + BackpackGUI.translateColors("&aHas restablecido los colores desbloqueados de &e" + target.getName() + " &aal estado por defecto (Solo Gris)."));
+                sender.sendMessage(
+                        prefix + BackpackGUI.translateColors("&aHas restablecido los colores desbloqueados de &e"
+                                + target.getName() + " &aal estado por defecto (Solo Gris)."));
                 return true;
             }
 
             if (action.equalsIgnoreCase("addcolor")) {
                 if (args.length < 4) {
-                    sender.sendMessage(prefix + BackpackGUI.translateColors("&cEspecifica el color. Uso: /mochila admin addcolor <player> <color>"));
+                    sender.sendMessage(prefix + BackpackGUI
+                            .translateColors("&cEspecifica el color. Uso: /mochila admin addcolor <player> <color>"));
                     return true;
                 }
                 String colorKey = args[3];
@@ -281,13 +295,15 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                 data.unlockSkin(colorKey);
                 plugin.getBackpackManager().saveBackpack(targetUUID);
 
-                sender.sendMessage(prefix + BackpackGUI.translateColors("&aHas desbloqueado el aspecto &e" + colorKey + " &apara &b" + target.getName() + "&a."));
+                sender.sendMessage(prefix + BackpackGUI.translateColors(
+                        "&aHas desbloqueado el aspecto &e" + colorKey + " &apara &b" + target.getName() + "&a."));
                 return true;
             }
 
             if (action.equalsIgnoreCase("removecolor")) {
                 if (args.length < 4) {
-                    sender.sendMessage(prefix + BackpackGUI.translateColors("&cEspecifica el color. Uso: /mochila admin removecolor <player> <color>"));
+                    sender.sendMessage(prefix + BackpackGUI.translateColors(
+                            "&cEspecifica el color. Uso: /mochila admin removecolor <player> <color>"));
                     return true;
                 }
                 String colorKey = args[3];
@@ -299,7 +315,8 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                 plugin.getBackpackManager().saveBackpack(targetUUID);
                 plugin.getBackpackDisplayManager().updateDisplay(target);
 
-                sender.sendMessage(prefix + BackpackGUI.translateColors("&cHas bloqueado/quitado el aspecto &e" + colorKey + " &cpara &b" + target.getName() + "&c."));
+                sender.sendMessage(prefix + BackpackGUI.translateColors(
+                        "&cHas bloqueado/quitado el aspecto &e" + colorKey + " &cpara &b" + target.getName() + "&c."));
                 return true;
             }
 
@@ -319,28 +336,42 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                 list.add("give");
                 list.add("admin");
             }
-            return list.stream().filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase())).collect(Collectors.toList());
+            return list.stream().filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase()))
+                    .collect(Collectors.toList());
         }
 
         if (args.length == 2) {
             if (args[0].equalsIgnoreCase("give") && sender.hasPermission("backpack.admin")) {
-                return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase())).collect(Collectors.toList());
+                return Bukkit.getOnlinePlayers().stream().map(Player::getName)
+                        .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
+                        .collect(Collectors.toList());
             }
             if (args[0].equalsIgnoreCase("admin") && sender.hasPermission("backpack.admin")) {
-                return Arrays.asList("setslots", "getslots", "resetslots", "resetcolors", "addcolor", "removecolor", "inspect", "addloc", "removeloc", "reload").stream().filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase())).collect(Collectors.toList());
+                return Arrays
+                        .asList("setslots", "getslots", "resetslots", "resetcolors", "addcolor", "removecolor",
+                                "inspect", "addloc", "removeloc", "reload")
+                        .stream().filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase()))
+                        .collect(Collectors.toList());
             }
         }
 
         if (args.length == 3) {
             if (args[0].equalsIgnoreCase("admin") && sender.hasPermission("backpack.admin")) {
                 String action = args[1];
-                if (action.equalsIgnoreCase("setslots") || action.equalsIgnoreCase("getslots") || action.equalsIgnoreCase("resetslots") || action.equalsIgnoreCase("resetcolors") || action.equalsIgnoreCase("addcolor") || action.equalsIgnoreCase("removecolor") || action.equalsIgnoreCase("inspect")) {
-                    return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().startsWith(args[2].toLowerCase())).collect(Collectors.toList());
+                if (action.equalsIgnoreCase("setslots") || action.equalsIgnoreCase("getslots")
+                        || action.equalsIgnoreCase("resetslots") || action.equalsIgnoreCase("resetcolors")
+                        || action.equalsIgnoreCase("addcolor") || action.equalsIgnoreCase("removecolor")
+                        || action.equalsIgnoreCase("inspect")) {
+                    return Bukkit.getOnlinePlayers().stream().map(Player::getName)
+                            .filter(name -> name.toLowerCase().startsWith(args[2].toLowerCase()))
+                            .collect(Collectors.toList());
                 }
                 if (action.equalsIgnoreCase("addloc")) {
                     ConfigurationSection skinsSection = plugin.getConfig().getConfigurationSection("backpack-skins");
                     if (skinsSection != null) {
-                        return new ArrayList<>(skinsSection.getKeys(false)).stream().filter(s -> s.toLowerCase().startsWith(args[2].toLowerCase())).collect(Collectors.toList());
+                        return new ArrayList<>(skinsSection.getKeys(false)).stream()
+                                .filter(s -> s.toLowerCase().startsWith(args[2].toLowerCase()))
+                                .collect(Collectors.toList());
                     }
                 }
             }
@@ -352,7 +383,9 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
                 if (action.equalsIgnoreCase("addcolor") || action.equalsIgnoreCase("removecolor")) {
                     ConfigurationSection skinsSection = plugin.getConfig().getConfigurationSection("backpack-skins");
                     if (skinsSection != null) {
-                        return new ArrayList<>(skinsSection.getKeys(false)).stream().filter(s -> s.toLowerCase().startsWith(args[3].toLowerCase())).collect(Collectors.toList());
+                        return new ArrayList<>(skinsSection.getKeys(false)).stream()
+                                .filter(s -> s.toLowerCase().startsWith(args[3].toLowerCase()))
+                                .collect(Collectors.toList());
                     }
                 }
             }
@@ -404,9 +437,16 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
             meta.setDisplayName(BackpackGUI.translateColors(finalName));
 
             List<String> lore = plugin.getConfig().getStringList("backpack-item.lore");
+            if (lore == null || lore.isEmpty()) {
+                lore = new ArrayList<>();
+                lore.add("&7Propietario: &e%owner%");
+            }
             List<String> coloredLore = new ArrayList<>();
+            String displayOwner = ownerName != null ? ownerName : (player != null ? player.getName() : "Desconocido");
             for (String line : lore) {
-                coloredLore.add(BackpackGUI.translateColors(line));
+                String formatted = line.replace("%owner%", displayOwner).replace("%player%", displayOwner)
+                        .replace("%user%", displayOwner);
+                coloredLore.add(BackpackGUI.translateColors(formatted));
             }
             meta.setLore(coloredLore);
 
@@ -415,8 +455,8 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
             pdc.set(backpackKey, PersistentDataType.BYTE, (byte) 1);
             pdc.set(new NamespacedKey(plugin, "backpack_skin"), PersistentDataType.STRING, skinKey);
             pdc.set(new NamespacedKey(plugin, "backpack_id"), PersistentDataType.STRING, backpackId.toString());
-            if (ownerName != null && !ownerName.isEmpty()) {
-                pdc.set(new NamespacedKey(plugin, "backpack_owner"), PersistentDataType.STRING, ownerName);
+            if (displayOwner != null && !displayOwner.isEmpty()) {
+                pdc.set(new NamespacedKey(plugin, "backpack_owner"), PersistentDataType.STRING, displayOwner);
             }
 
             item.setItemMeta(meta);
@@ -426,22 +466,27 @@ public class BackpackCommand implements CommandExecutor, TabCompleter {
     }
 
     public void updatePhysicalBackpacks(Player player) {
-        if (player == null || !player.isOnline()) return;
+        if (player == null || !player.isOnline())
+            return;
         ItemStack[] contents = player.getInventory().getContents();
         for (int i = 0; i < contents.length; i++) {
             ItemStack item = contents[i];
             if (item != null && isBackpackItem(item)) {
                 ItemMeta meta = item.getItemMeta();
-                String storedId = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "backpack_id"), PersistentDataType.STRING);
-                String storedOwner = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "backpack_owner"), PersistentDataType.STRING);
+                String storedId = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "backpack_id"),
+                        PersistentDataType.STRING);
+                String storedOwner = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "backpack_owner"),
+                        PersistentDataType.STRING);
                 UUID bId = storedId != null ? UUID.fromString(storedId) : player.getUniqueId();
-                
+
                 BackpackManager.BackpackData data = plugin.getBackpackManager().getBackpack(bId, player.getUniqueId());
                 String activeSkin = data != null ? data.getActiveSkin() : null;
                 if (activeSkin == null || activeSkin.isEmpty()) {
-                    activeSkin = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "backpack_skin"), PersistentDataType.STRING);
+                    activeSkin = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "backpack_skin"),
+                            PersistentDataType.STRING);
                 }
-                if (activeSkin == null) activeSkin = "gray";
+                if (activeSkin == null)
+                    activeSkin = "gray";
 
                 ItemStack updated = createBackpackItem(player, activeSkin, bId, storedOwner);
                 updated.setAmount(item.getAmount());
